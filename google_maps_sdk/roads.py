@@ -4,8 +4,9 @@ Roads API Client
 Service for snapping GPS coordinates to roads and getting road metadata.
 """
 
-from typing import Optional, List, Dict, Any
+from typing import Optional, List, Dict, Any, Tuple
 from .base_client import BaseClient
+from .utils import validate_path_or_points, MAX_ROADS_POINTS
 
 
 class RoadsClient(BaseClient):
@@ -43,8 +44,8 @@ class RoadsClient(BaseClient):
             >>> path = [(60.170880, 24.942795), (60.170879, 24.942796), (60.170877, 24.942796)]
             >>> result = client.snap_to_roads(path, interpolate=True)
         """
-        if len(path) > 100:
-            raise ValueError("Maximum 100 points allowed per request")
+        # Validation (issues #20, #23)
+        validate_path_or_points(path=path, points=None, max_points=MAX_ROADS_POINTS)
 
         # Format path as pipe-separated lat,lng pairs
         path_str = "|".join([f"{lat},{lng}" for lat, lng in path])
@@ -75,8 +76,8 @@ class RoadsClient(BaseClient):
             >>> points = [(60.170880, 24.942795), (60.170879, 24.942796)]
             >>> result = client.nearest_roads(points)
         """
-        if len(points) > 100:
-            raise ValueError("Maximum 100 points allowed per request")
+        # Validation (issues #20, #23)
+        validate_path_or_points(path=None, points=points, max_points=MAX_ROADS_POINTS)
 
         # Format points as pipe-separated lat,lng pairs
         points_str = "|".join([f"{lat},{lng}" for lat, lng in points])
@@ -109,6 +110,7 @@ class RoadsClient(BaseClient):
             >>> place_ids = ["ChIJ685WIFYViEgRHlHvBbiD5nE", "ChIJA01I-8YVhkgRGJb0fW4UX7Y"]
             >>> result = client.speed_limits(place_ids=place_ids)
         """
+        # Validation (issues #20, #23, #97)
         if path and place_ids:
             raise ValueError("Either path or place_ids must be provided, not both")
 
@@ -118,14 +120,17 @@ class RoadsClient(BaseClient):
         params: Dict[str, Any] = {}
 
         if path:
-            if len(path) > 100:
-                raise ValueError("Maximum 100 points allowed per request")
+            validate_path_or_points(path=path, points=None, max_points=MAX_ROADS_POINTS)
             path_str = "|".join([f"{lat},{lng}" for lat, lng in path])
             params["path"] = path_str
 
         if place_ids:
-            if len(place_ids) > 100:
-                raise ValueError("Maximum 100 place IDs allowed per request")
+            if not isinstance(place_ids, list):
+                raise TypeError("Place IDs must be a list")
+            if len(place_ids) == 0:
+                raise ValueError("Place IDs list cannot be empty")
+            if len(place_ids) > MAX_ROADS_POINTS:
+                raise ValueError(f"Maximum {MAX_ROADS_POINTS} place IDs allowed per request")
             params["placeId"] = ",".join(place_ids)
 
         return self._get("/speedLimits", params=params)

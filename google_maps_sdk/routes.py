@@ -6,6 +6,19 @@ Modern routing API with traffic-aware routing capabilities.
 
 from typing import Optional, Dict, Any, List
 from .base_client import BaseClient
+from .utils import (
+    validate_waypoint_count,
+    validate_route_matrix_size,
+    validate_enum_value,
+    validate_language_code,
+    validate_units,
+    validate_departure_time,
+    validate_field_mask,
+    VALID_TRAVEL_MODES,
+    VALID_ROUTING_PREFERENCES,
+    VALID_POLYLINE_QUALITY,
+    VALID_POLYLINE_ENCODING,
+)
 
 
 class RoutesClient(BaseClient):
@@ -70,6 +83,24 @@ class RoutesClient(BaseClient):
             >>> destination = {"location": {"latLng": {"latitude": 37.417670, "longitude": -122.079595}}}
             >>> result = client.compute_routes(origin, destination, routing_preference="TRAFFIC_AWARE")
         """
+        # Validation (issues #15, #16, #24, #34, #43, #44, #25)
+        validate_waypoint_count(intermediates)
+        travel_mode = validate_enum_value(travel_mode, VALID_TRAVEL_MODES, "travel_mode")
+        if routing_preference:
+            routing_preference = validate_enum_value(routing_preference, VALID_ROUTING_PREFERENCES, "routing_preference")
+        if language_code:
+            language_code = validate_language_code(language_code)
+        if units:
+            units = validate_units(units)
+        if departure_time:
+            departure_time = validate_departure_time(departure_time)
+        if field_mask:
+            field_mask = validate_field_mask(field_mask)
+        if polyline_quality:
+            polyline_quality = validate_enum_value(polyline_quality, VALID_POLYLINE_QUALITY, "polyline_quality")
+        if polyline_encoding:
+            polyline_encoding = validate_enum_value(polyline_encoding, VALID_POLYLINE_ENCODING, "polyline_encoding")
+        
         endpoint = "/directions/v2:computeRoutes"
         
         request_body: Dict[str, Any] = {
@@ -152,6 +183,20 @@ class RoutesClient(BaseClient):
             >>> destinations = [{"location": {"latLng": {"latitude": 37.417670, "longitude": -122.079595}}}]
             >>> result = client.compute_route_matrix(origins, destinations)
         """
+        # Validation (issues #15, #22, #41, #34, #43, #44, #25)
+        validate_route_matrix_size(origins, destinations)
+        travel_mode = validate_enum_value(travel_mode, VALID_TRAVEL_MODES, "travel_mode")
+        if routing_preference:
+            routing_preference = validate_enum_value(routing_preference, VALID_ROUTING_PREFERENCES, "routing_preference")
+        if language_code:
+            language_code = validate_language_code(language_code)
+        if units:
+            units = validate_units(units)
+        if departure_time:
+            departure_time = validate_departure_time(departure_time)
+        if field_mask:
+            field_mask = validate_field_mask(field_mask)
+        
         endpoint = "/distanceMatrix/v2:computeRouteMatrix"
 
         request_body: Dict[str, Any] = {
