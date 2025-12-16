@@ -31,7 +31,10 @@ def main():
     else:
         args = parser.parse_args()
         if args.api_key:
-            print(f"API key provided: {args.api_key[:10]}...")
+            # Use hash instead of exposing API key (issue #3)
+            from .utils import hash_api_key
+            key_hash = hash_api_key(args.api_key)
+            print(f"API key hash: {key_hash}...")
             print("Use the SDK in your Python code:")
             print("  from google_maps_sdk import GoogleMapsClient")
             print("  client = GoogleMapsClient(api_key='YOUR_KEY')")

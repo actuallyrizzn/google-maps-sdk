@@ -6,6 +6,15 @@ Legacy directions service. Consider migrating to Routes API for new projects.
 
 from typing import Optional, Dict, Any, List, Union
 from .base_client import BaseClient
+from .utils import (
+    validate_waypoint_count,
+    validate_language_code,
+    validate_units,
+    validate_departure_time,
+    validate_non_empty_string,
+    validate_enum_value,
+    VALID_TRAVEL_MODES,
+)
 
 
 class DirectionsClient(BaseClient):
@@ -68,6 +77,18 @@ class DirectionsClient(BaseClient):
             >>> client = DirectionsClient(api_key="YOUR_KEY")
             >>> result = client.get_directions("Toronto", "Montreal")
         """
+        # Validation (issues #16, #24, #43, #44, #25, #15)
+        validate_non_empty_string(origin, "origin")
+        validate_non_empty_string(destination, "destination")
+        validate_waypoint_count(waypoints)
+        mode = validate_enum_value(mode, VALID_TRAVEL_MODES, "mode", normalize_case=False)
+        if language:
+            language = validate_language_code(language)
+        if units:
+            units = validate_units(units)
+        if departure_time:
+            departure_time = validate_departure_time(departure_time)
+        
         params: Dict[str, Any] = {
             "origin": origin,
             "destination": destination,
@@ -75,7 +96,9 @@ class DirectionsClient(BaseClient):
         }
 
         if waypoints:
-            params["waypoints"] = "|".join(waypoints)
+            # Sanitize waypoints (issue #8)
+            sanitized_waypoints = [validate_non_empty_string(wp, "waypoint") for wp in waypoints]
+            params["waypoints"] = "|".join(sanitized_waypoints)
 
         if alternatives:
             params["alternatives"] = "true"
@@ -200,4 +223,8 @@ class DirectionsClient(BaseClient):
             transit_routing_preference=transit_routing_preference,
             output_format="xml",
         )
+
+    def __repr__(self) -> str:
+        """String representation of client (issue #52)"""
+        return f"{self.__class__.__name__}(api_key='***', timeout={self.timeout})"
 
