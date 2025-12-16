@@ -4,6 +4,7 @@ Base client class for Google Maps Platform APIs
 
 import requests
 import warnings
+import time
 from typing import Optional, Dict, Any
 from .exceptions import (
     handle_http_error,
@@ -20,6 +21,7 @@ from .utils import (
     sanitize_api_key_for_logging,
 )
 from .rate_limiter import RateLimiter
+from .retry import RetryConfig, should_retry, exponential_backoff
 
 
 class BaseClient:
@@ -32,6 +34,7 @@ class BaseClient:
         timeout: int = 30,
         rate_limit_max_calls: Optional[int] = None,
         rate_limit_period: Optional[float] = None,
+        retry_config: Optional[RetryConfig] = None,
     ):
         """
         Initialize base client
@@ -42,6 +45,7 @@ class BaseClient:
             timeout: Request timeout in seconds
             rate_limit_max_calls: Maximum calls per period for rate limiting (None to disable)
             rate_limit_period: Time period in seconds for rate limiting (default: 60.0)
+            retry_config: Retry configuration (None to disable retries) (issue #11)
 
         Raises:
             TypeError: If api_key is not a string
@@ -62,6 +66,9 @@ class BaseClient:
             self._rate_limiter = RateLimiter(max_calls=rate_limit_max_calls, period=period)
         else:
             self._rate_limiter = None
+        
+        # Initialize retry configuration (issue #11)
+        self._retry_config = retry_config
         
         # Store client ID for rate limiting
         self._client_id = id(self)
@@ -111,7 +118,7 @@ class BaseClient:
 
     def _get(self, endpoint: str, params: Optional[Dict[str, Any]] = None, timeout: Optional[int] = None) -> Dict[str, Any]:
         """
-        Make a GET request
+        Make a GET request with optional retry logic (issue #11)
 
         Args:
             endpoint: API endpoint
@@ -139,13 +146,77 @@ class BaseClient:
         # Use provided timeout or default (issue #12)
         request_timeout = timeout if timeout is not None else self.timeout
         
-        try:
-            response = self.session.get(url, params=params, timeout=request_timeout)
-            return self._handle_response(response)
-        except requests.exceptions.RequestException as e:
-            # Sanitize error message to prevent API key exposure (issue #7)
-            error_msg = sanitize_api_key_for_logging(str(e), self._api_key)
-            raise GoogleMapsAPIError(f"Request failed: {error_msg}") from e
+        # Retry logic (issue #11)
+        last_exception = None
+        
+        max_retries = self._retry_config.max_retries if self._retry_config else 0
+        
+        for attempt in range(max_retries + 1):
+            try:
+                response = self.session.get(url, params=params, timeout=request_timeout)
+                # _handle_response may raise GoogleMapsAPIError for HTTP errors
+                return self._handle_response(response)
+            except (requests.exceptions.Timeout, requests.exceptions.ConnectionError) as e:
+                last_exception = e
+                
+                # Check if we should retry
+                if self._retry_config and should_retry(e, None):
+                    # Don't retry on last attempt
+                    if attempt >= max_retries:
+                        break
+                    
+                    # Calculate backoff delay
+                    delay = exponential_backoff(
+                        attempt,
+                        base_delay=self._retry_config.base_delay,
+                        max_delay=self._retry_config.max_delay,
+                        exponential_base=self._retry_config.exponential_base,
+                        jitter=self._retry_config.jitter
+                    )
+                    
+                    # Wait before retrying
+                    time.sleep(delay)
+                    continue
+                else:
+                    # Non-retryable exception - raise immediately
+                    break
+            except GoogleMapsAPIError as e:
+                last_exception = e
+                
+                # Check if we should retry (e.g., 5xx errors)
+                if self._retry_config and should_retry(e, e.status_code):
+                    if attempt >= max_retries:
+                        break
+                    
+                    delay = exponential_backoff(
+                        attempt,
+                        base_delay=self._retry_config.base_delay,
+                        max_delay=self._retry_config.max_delay,
+                        exponential_base=self._retry_config.exponential_base,
+                        jitter=self._retry_config.jitter
+                    )
+                    
+                    time.sleep(delay)
+                    continue
+                else:
+                    # Non-retryable exception - raise immediately
+                    raise
+            except requests.exceptions.RequestException as e:
+                # Other request exceptions - don't retry
+                error_msg = sanitize_api_key_for_logging(str(e), self._api_key)
+                raise GoogleMapsAPIError(f"Request failed: {error_msg}") from e
+        
+        # If we get here, all retries failed
+        if last_exception:
+            if isinstance(last_exception, (requests.exceptions.Timeout, requests.exceptions.ConnectionError)):
+                # Sanitize error message to prevent API key exposure (issue #7)
+                error_msg = sanitize_api_key_for_logging(str(last_exception), self._api_key)
+                raise GoogleMapsAPIError(f"Request failed after {max_retries + 1} attempts: {error_msg}") from last_exception
+            else:
+                raise last_exception
+        
+        # Should never reach here
+        raise GoogleMapsAPIError("Request failed: Unknown error")
 
     def _post(
         self,
@@ -156,7 +227,7 @@ class BaseClient:
         timeout: Optional[int] = None,
     ) -> Dict[str, Any]:
         """
-        Make a POST request
+        Make a POST request with optional retry logic (issue #11)
 
         Args:
             endpoint: API endpoint
@@ -189,15 +260,79 @@ class BaseClient:
         # Use provided timeout or default (issue #12)
         request_timeout = timeout if timeout is not None else self.timeout
         
-        try:
-            response = self.session.post(
-                url, json=data, headers=headers, params=params, timeout=request_timeout
-            )
-            return self._handle_response(response)
-        except requests.exceptions.RequestException as e:
-            # Sanitize error message to prevent API key exposure (issue #7)
-            error_msg = sanitize_api_key_for_logging(str(e), self._api_key)
-            raise GoogleMapsAPIError(f"Request failed: {error_msg}") from e
+        # Retry logic (issue #11)
+        last_exception = None
+        
+        max_retries = self._retry_config.max_retries if self._retry_config else 0
+        
+        for attempt in range(max_retries + 1):
+            try:
+                response = self.session.post(
+                    url, json=data, headers=headers, params=params, timeout=request_timeout
+                )
+                # _handle_response may raise GoogleMapsAPIError for HTTP errors
+                return self._handle_response(response)
+            except (requests.exceptions.Timeout, requests.exceptions.ConnectionError) as e:
+                last_exception = e
+                
+                # Check if we should retry
+                if self._retry_config and should_retry(e, None):
+                    # Don't retry on last attempt
+                    if attempt >= max_retries:
+                        break
+                    
+                    # Calculate backoff delay
+                    delay = exponential_backoff(
+                        attempt,
+                        base_delay=self._retry_config.base_delay,
+                        max_delay=self._retry_config.max_delay,
+                        exponential_base=self._retry_config.exponential_base,
+                        jitter=self._retry_config.jitter
+                    )
+                    
+                    # Wait before retrying
+                    time.sleep(delay)
+                    continue
+                else:
+                    # Non-retryable exception - raise immediately
+                    break
+            except GoogleMapsAPIError as e:
+                last_exception = e
+                
+                # Check if we should retry (e.g., 5xx errors)
+                if self._retry_config and should_retry(e, e.status_code):
+                    if attempt >= max_retries:
+                        break
+                    
+                    delay = exponential_backoff(
+                        attempt,
+                        base_delay=self._retry_config.base_delay,
+                        max_delay=self._retry_config.max_delay,
+                        exponential_base=self._retry_config.exponential_base,
+                        jitter=self._retry_config.jitter
+                    )
+                    
+                    time.sleep(delay)
+                    continue
+                else:
+                    # Non-retryable exception - raise immediately
+                    raise
+            except requests.exceptions.RequestException as e:
+                # Other request exceptions - don't retry
+                error_msg = sanitize_api_key_for_logging(str(e), self._api_key)
+                raise GoogleMapsAPIError(f"Request failed: {error_msg}") from e
+        
+        # If we get here, all retries failed
+        if last_exception:
+            if isinstance(last_exception, (requests.exceptions.Timeout, requests.exceptions.ConnectionError)):
+                # Sanitize error message to prevent API key exposure (issue #7)
+                error_msg = sanitize_api_key_for_logging(str(last_exception), self._api_key)
+                raise GoogleMapsAPIError(f"Request failed after {max_retries + 1} attempts: {error_msg}") from last_exception
+            else:
+                raise last_exception
+        
+        # Should never reach here
+        raise GoogleMapsAPIError("Request failed: Unknown error")
 
     def _handle_response(self, response: requests.Response) -> Dict[str, Any]:
         """

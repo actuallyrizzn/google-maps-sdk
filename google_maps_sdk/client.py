@@ -8,6 +8,7 @@ from typing import Optional
 from .routes import RoutesClient
 from .directions import DirectionsClient
 from .roads import RoadsClient
+from .retry import RetryConfig
 
 
 class GoogleMapsClient:
@@ -24,6 +25,7 @@ class GoogleMapsClient:
         timeout: int = 30,
         rate_limit_max_calls: Optional[int] = None,
         rate_limit_period: Optional[float] = None,
+        retry_config: Optional[RetryConfig] = None,
     ):
         """
         Initialize Google Maps Platform client
@@ -33,6 +35,7 @@ class GoogleMapsClient:
             timeout: Request timeout in seconds for all API calls
             rate_limit_max_calls: Maximum calls per period for rate limiting (None to disable)
             rate_limit_period: Time period in seconds for rate limiting (default: 60.0)
+            retry_config: Retry configuration (None to disable retries) (issue #11)
 
         Example:
             >>> client = GoogleMapsClient(api_key="YOUR_API_KEY")
@@ -41,24 +44,27 @@ class GoogleMapsClient:
         self.api_key = api_key
         self.timeout = timeout
 
-        # Initialize sub-clients with rate limiting
+        # Initialize sub-clients with rate limiting and retry
         self.routes = RoutesClient(
             api_key, 
             timeout,
             rate_limit_max_calls=rate_limit_max_calls,
             rate_limit_period=rate_limit_period,
+            retry_config=retry_config,
         )
         self.directions = DirectionsClient(
             api_key, 
             timeout,
             rate_limit_max_calls=rate_limit_max_calls,
             rate_limit_period=rate_limit_period,
+            retry_config=retry_config,
         )
         self.roads = RoadsClient(
             api_key, 
             timeout,
             rate_limit_max_calls=rate_limit_max_calls,
             rate_limit_period=rate_limit_period,
+            retry_config=retry_config,
         )
 
     def set_api_key(self, api_key: str) -> None:

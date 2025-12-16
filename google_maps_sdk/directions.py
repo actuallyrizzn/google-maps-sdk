@@ -6,6 +6,7 @@ Legacy directions service. Consider migrating to Routes API for new projects.
 
 from typing import Optional, Dict, Any, List, Union
 from .base_client import BaseClient
+from .retry import RetryConfig
 from .utils import (
     validate_waypoint_count,
     validate_language_code,
@@ -28,6 +29,7 @@ class DirectionsClient(BaseClient):
         timeout: int = 30,
         rate_limit_max_calls: Optional[int] = None,
         rate_limit_period: Optional[float] = None,
+        retry_config: Optional[RetryConfig] = None,
     ):
         """
         Initialize Directions API client
@@ -37,6 +39,7 @@ class DirectionsClient(BaseClient):
             timeout: Request timeout in seconds
             rate_limit_max_calls: Maximum calls per period for rate limiting (None to disable)
             rate_limit_period: Time period in seconds for rate limiting (default: 60.0)
+            retry_config: Retry configuration (None to disable retries) (issue #11)
         """
         super().__init__(
             api_key, 
@@ -44,6 +47,7 @@ class DirectionsClient(BaseClient):
             timeout,
             rate_limit_max_calls=rate_limit_max_calls,
             rate_limit_period=rate_limit_period,
+            retry_config=retry_config,
         )
 
     def get_directions(
