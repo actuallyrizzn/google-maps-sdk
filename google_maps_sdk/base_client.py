@@ -4,7 +4,14 @@ Base client class for Google Maps Platform APIs
 
 import requests
 from typing import Optional, Dict, Any
-from .exceptions import handle_http_error, GoogleMapsAPIError
+from .exceptions import (
+    handle_http_error,
+    GoogleMapsAPIError,
+    PermissionDeniedError,
+    QuotaExceededError,
+    NotFoundError,
+    InvalidRequestError,
+)
 
 
 class BaseClient:
