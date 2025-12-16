@@ -18,13 +18,21 @@ class GoogleMapsClient:
     a single client interface.
     """
 
-    def __init__(self, api_key: str, timeout: int = 30):
+    def __init__(
+        self, 
+        api_key: str, 
+        timeout: int = 30,
+        rate_limit_max_calls: Optional[int] = None,
+        rate_limit_period: Optional[float] = None,
+    ):
         """
         Initialize Google Maps Platform client
 
         Args:
             api_key: Google Maps Platform API key
             timeout: Request timeout in seconds for all API calls
+            rate_limit_max_calls: Maximum calls per period for rate limiting (None to disable)
+            rate_limit_period: Time period in seconds for rate limiting (default: 60.0)
 
         Example:
             >>> client = GoogleMapsClient(api_key="YOUR_API_KEY")
@@ -33,10 +41,25 @@ class GoogleMapsClient:
         self.api_key = api_key
         self.timeout = timeout
 
-        # Initialize sub-clients
-        self.routes = RoutesClient(api_key, timeout)
-        self.directions = DirectionsClient(api_key, timeout)
-        self.roads = RoadsClient(api_key, timeout)
+        # Initialize sub-clients with rate limiting
+        self.routes = RoutesClient(
+            api_key, 
+            timeout,
+            rate_limit_max_calls=rate_limit_max_calls,
+            rate_limit_period=rate_limit_period,
+        )
+        self.directions = DirectionsClient(
+            api_key, 
+            timeout,
+            rate_limit_max_calls=rate_limit_max_calls,
+            rate_limit_period=rate_limit_period,
+        )
+        self.roads = RoadsClient(
+            api_key, 
+            timeout,
+            rate_limit_max_calls=rate_limit_max_calls,
+            rate_limit_period=rate_limit_period,
+        )
 
     def set_api_key(self, api_key: str) -> None:
         """

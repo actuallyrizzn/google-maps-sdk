@@ -19,12 +19,20 @@ from .utils import (
     validate_timeout,
     sanitize_api_key_for_logging,
 )
+from .rate_limiter import RateLimiter
 
 
 class BaseClient:
     """Base client for all Google Maps Platform API clients"""
 
-    def __init__(self, api_key: str, base_url: str, timeout: int = 30):
+    def __init__(
+        self, 
+        api_key: str, 
+        base_url: str, 
+        timeout: int = 30,
+        rate_limit_max_calls: Optional[int] = None,
+        rate_limit_period: Optional[float] = None,
+    ):
         """
         Initialize base client
 
@@ -32,6 +40,8 @@ class BaseClient:
             api_key: Google Maps Platform API key
             base_url: Base URL for the API
             timeout: Request timeout in seconds
+            rate_limit_max_calls: Maximum calls per period for rate limiting (None to disable)
+            rate_limit_period: Time period in seconds for rate limiting (default: 60.0)
 
         Raises:
             TypeError: If api_key is not a string
@@ -45,6 +55,16 @@ class BaseClient:
         
         # Validate timeout (issue #40)
         self.timeout = validate_timeout(timeout)
+        
+        # Initialize rate limiter (issue #5)
+        if rate_limit_max_calls is not None:
+            period = rate_limit_period if rate_limit_period is not None else 60.0
+            self._rate_limiter = RateLimiter(max_calls=rate_limit_max_calls, period=period)
+        else:
+            self._rate_limiter = None
+        
+        # Store client ID for rate limiting
+        self._client_id = id(self)
         
         # Create session with SSL verification enforced (issue #4)
         self.session = requests.Session()
@@ -103,7 +123,12 @@ class BaseClient:
 
         Raises:
             GoogleMapsAPIError: If request fails
+            QuotaExceededError: If rate limit is exceeded (issue #5)
         """
+        # Apply rate limiting (issue #5)
+        if self._rate_limiter is not None:
+            self._rate_limiter.acquire(self._client_id)
+        
         url = f"{self.base_url}/{endpoint.lstrip('/')}"
         
         if params is None:
@@ -145,7 +170,12 @@ class BaseClient:
 
         Raises:
             GoogleMapsAPIError: If request fails
+            QuotaExceededError: If rate limit is exceeded (issue #5)
         """
+        # Apply rate limiting (issue #5)
+        if self._rate_limiter is not None:
+            self._rate_limiter.acquire(self._client_id)
+        
         url = f"{self.base_url}/{endpoint.lstrip('/')}"
         
         if params is None:

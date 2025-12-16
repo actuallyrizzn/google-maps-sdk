@@ -22,15 +22,29 @@ class DirectionsClient(BaseClient):
 
     BASE_URL = "https://maps.googleapis.com/maps/api/directions"
 
-    def __init__(self, api_key: str, timeout: int = 30):
+    def __init__(
+        self, 
+        api_key: str, 
+        timeout: int = 30,
+        rate_limit_max_calls: Optional[int] = None,
+        rate_limit_period: Optional[float] = None,
+    ):
         """
         Initialize Directions API client
 
         Args:
             api_key: Google Maps Platform API key
             timeout: Request timeout in seconds
+            rate_limit_max_calls: Maximum calls per period for rate limiting (None to disable)
+            rate_limit_period: Time period in seconds for rate limiting (default: 60.0)
         """
-        super().__init__(api_key, self.BASE_URL, timeout)
+        super().__init__(
+            api_key, 
+            self.BASE_URL, 
+            timeout,
+            rate_limit_max_calls=rate_limit_max_calls,
+            rate_limit_period=rate_limit_period,
+        )
 
     def get_directions(
         self,
