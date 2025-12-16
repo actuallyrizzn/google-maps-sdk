@@ -1,0 +1,1204 @@
+{
+  "scraped_pages": {
+    "Google Maps Platform Overview": {
+      "name": "Google Maps Platform Overview",
+      "url": "https://developers.google.com/maps",
+      "headings": [
+        "Maps Platform",
+        "Build awesome apps with Google's knowledge of the real world",
+        "Explore top topics",
+        "Introducing\nPlaces UI Kit",
+        "Get going with Navigation SDK",
+        "Make an animated 3D map",
+        "Get answers from Places Aggregate API",
+        "React components for the Maps JavaScript API",
+        "Learn with Codelabs",
+        "Add a Google map to a React app",
+        "Add a map to your iOS app with SwiftUI",
+        "Add a map to your Android app with Compose",
+        "Add a map to your Flutter app",
+        "Shape the future of Google Maps Platform",
+        "Watch Google Maps Platform videos",
+        "Announcing the new Places API",
+        "Introducing the Air Quality and Pollen APIs",
+        "How to add a map to your Flutter app",
+        "Using React with the Maps JavaScript API",
+        "Full deck.gl integration with WebGL Overlay View",
+        "How Domino's delivers pizza anywhere",
+        "How to enable Google Maps Platform APIs and SDKs",
+        "Intro to Google Maps Platform",
+        "Join our developer community",
+        "LinkedIn",
+        "GitHub",
+        "YouTube",
+        "Blog",
+        "Twitter",
+        "Discord",
+        "Learn More",
+        "Platforms",
+        "Product Info",
+        "Page info"
+      ],
+      "endpoints": [
+        "Started</a>",
+        "help",
+        "aria-activedescendant=\"\"",
+        "Started</li>",
+        "https://www.googleapis.com/auth/devprofiles.full_control.firstparty",
+        "started\"",
+        "Started",
+        "https://www.googleapis.com/auth/developerprofiles",
+        "going",
+        "started",
+        "type=\"text\"",
+        "https://fonts.googleapis.com/css?family=Google+Sans:400,500|Roboto:400,400italic,500,500italic,700,700italic|Roboto+Mono:400,500,700&display=swap",
+        "answers",
+        "{",
+        "https://www.googleapis.com/auth/developerprofiles.award"
+      ],
+      "api_methods": [],
+      "text_preview": "Skip to main content\nMaps Platform\nOverview\nProducts\nPricing\nDocumentation\nBlog\nCommunity\n/\nSign in\nContact Sales\nGet Started\nBuild awesome apps with Google's knowledge of the real world\nCreate real-world, real-time experiences with the latest Maps, Routes, and Places features from Google Maps Platform. Built by the Google team for developers everywhere.\nGet Started\nSee our pricing structure\nVisit documentationarrow_forward\nExplore top topics\nIntroducing\nPlaces UI Kit\n\nBring the familiar Google Maps user experience for Places to your apps and web pages.\n\nGet going with Navigation SDK\n\nDeliver seamless, customized in-app Google Maps navigation to your Android and iOS apps.\n\nMake an animated 3D map\n\nTake this codelab to learn how to add an animated 3D map with markers to your web app.\n\nGet answers from Places Aggregate API\n\nLearn about the Preview release a new API to retrieve the density of places within a geographic area for powerful analytics and recommendations.\n\nReact components for the Maps JavaScript API\n\nThe lead engineers behind the @vis.gl/react-google-map library walk through its technical design.\n\nLearn with Codelabs\nAdd a Google map to a React app\n\nIn this codelab, you learn everything that you need to get started with the vis.gl/react-google-map library for the Google Maps JavaScript API.\n\nAdd a map to your iOS app with SwiftUI\n\nLearn how to integrate the Maps SDK for iOS into your mobile apps using SwiftUI.\n\nAdd a map to your Android app with Compose\n\nLearn the basics of using the Maps Compose library with the Maps SDK for Android.\n\nAdd a map to your Flutter app\n\nGenerate Android, iOS, and web apps from a single Dart file.\n\nTry more codelabs →\nShape the future of Google Maps Platform\n\nThe Google Maps Platform Innovators program, helps developers like you with resources and opportunities to enhance your experience with Google Maps Platform. Receive early access to new products and features, access to a community of developers, and more!\n\nJoin Google Maps Platform Innovators\nWatch Google Maps Platform videos\nSubscribe to Our YouTube Channel\nAnnouncing the new Places API\n\nWith the new Places API there are now double the number of supported place types including EV charging stations, coffee shops, accessibility accommodation at destinations, and more.\n\nIntroducing the Air Quality and Pollen APIs\n\nAllow users to avoid exposure to air pollutants and airborne pollen at their location, and empower more informed health-related daily decision making.\n\nHow to add a map to your Flutter app\n\nLearn how to add a Google map to native Android, iOS, and web apps with Dart and Flutter.\n\nUsing React with the Maps JavaScript API\n\nLearn how to how to load the Maps JavaScript API and place a marker on the map in React in just 5 minutes.\n\nFull deck.gl integration with WebGL Overlay View\n\nEngineering Lead Travis McPhail shares that deck.gl is now integrated with WebGL Overlay View, allowing you to create amazing 3D data visualizations.\n\nHow Domino's delivers pizza anywhere\n\nSee how Domino's uses Google Maps Platform to power its Pinpoint Delivery feature.\n\nHow to enable Google Maps Platform APIs and SDKs\n\nLearn how to enable Google Maps Platform APIs and SDKs in the Google Cloud console. APIs and SDKs are available for Maps, Routes, and Places across web and mobile platforms.\n\nIntro to Google Maps Platform\n\nIn this video, Angela Yu gives an overview of what's available through Google Maps Platform APIs and SDKs and shares some sample code for using them.\n\nWatch more on the Google Maps Platform YouTube channel →\nJoin our developer community\nLinkedIn\n\nFollow the latest news from the Google Maps Platform team and celebrate developer community projects.\n\nGitHub\n\nCheck out our open source utilities and example apps to help you build better and faster.\n\nYouTube\n\nTutorials, tips, announcements, developer stories, and more.\n\nBlog\n\nAll the latest in-depth news and stories from the world of Google Maps Platform.\n\nTwitter\n\nKeep up-to-date on the latest news & tips from the Google Maps Platform team.\n\nDiscord\n\nGet help from other developers and meet our team on the Google Maps Platform Discord server.\n\nPlatform Status\nFind out about platform incidents and outages.\nSupport\nGet help from the Support team.\nDiscord\nChat with fellow developers about Google Maps Platform.\nIssue Tracker\nSomething wrong? Send us a bug report!\nLearn More\nFAQ\nCapabilities Explorer\nGetting started\nAPI security best practices\nPlatforms\nAndroid\niOS\nWeb\nWeb Services\nProduct Info\nPricing and Plans\nContact Sales\nSupport\nTerms of Service\nAndroid\nChrome\nFirebase\nGoogle Cloud Platform\nGoogle AI\nAll products\nTerms\nPrivacy\nInfo\nChat\nAPI\nPage info\nbug_report\nfullscreen\nclose\n\nNo additional info available on this page."
+    },
+    "Directions API": {
+      "name": "Directions API",
+      "url": "https://developers.google.com/maps/documentation/directions",
+      "headings": [
+        "Maps Platform",
+        "Directions API (Legacy)\nbookmark_border",
+        "Get Started",
+        "Get started with Google Maps Platform",
+        "Make your first directions request",
+        "Client libraries",
+        "Directions in Maps JavaScript API",
+        "Features",
+        "Directions",
+        "Travel mode",
+        "Waypoints",
+        "Traffic predictions",
+        "Location modifiers",
+        "Alternative routes",
+        "Example apps",
+        "Directions service",
+        "Text (turn-by-turn) directions",
+        "Using waypoints in directions",
+        "Draggable directions",
+        "Complex directions",
+        "Help & support",
+        "Stack Overflow",
+        "Issue Tracker",
+        "Platform status",
+        "Support",
+        "Learn More",
+        "Platforms",
+        "Product Info",
+        "Page info",
+        "On this page"
+      ],
+      "endpoints": [
+        "Started</a>",
+        "https://www.googleapis.com/auth/devprofiles.full_control.firstparty",
+        "Started</span></a></li><li",
+        "directions",
+        "started</span></a></li>",
+        "Started",
+        "type=\"text\"",
+        "started",
+        "https://fonts.googleapis.com/css?family=Google+Sans:400,500|Roboto:400,400italic,500,500italic,700,700italic|Roboto+Mono:400,500,700&display=swap",
+        "help.",
+        "help",
+        "started\"",
+        "directions</span></a></li>",
+        "{",
+        "aria-activedescendant=\"\"",
+        "Started</li>",
+        "https://www.googleapis.com/auth/developerprofiles",
+        "https://www.googleapis.com/auth/developerprofiles.award",
+        "Started\""
+      ],
+      "api_methods": [],
+      "text_preview": "Skip to main content\nMaps Platform\nOverview\nProducts\nPricing\nDocumentation\nBlog\nCommunity\n/\nSign in\nWeb Services\nDirections API (Legacy)\nGet Started\nContact sales\nGuides\nResources\nDirections API (Legacy)\nOverview\nGet started\nSetup\nSet up your Google Cloud project\nUse API Keys\nDeveloper Guides\nGet directions\nThis product or feature is in Legacy status. For more information about Legacy status and how to migrate from Legacy to newer services, see Legacy products and features.\nDirections API (Legacy)\nbookmark_border\n\nGet directions between locations, for driving, cycling, transit, and walking.\n\nGet Started \nStart building with the Directions API.\nexplore\nGet started with Google Maps Platform\nCreate an account, generate an API key, and start building.\ndirections\nMake your first directions request\nGet directions from one place to another, for driving, transit, cycling, and walking.\ncode\nClient libraries\nUse the Java, Python, Go, or Node.js client libraries to work with Google Maps Services on your server.\ncode\nDirections in Maps JavaScript API\nAdd directions functionality to your web pages with the Maps JavaScript API Directions service.\nFeatures\nLearn about core features of the Directions API.\nDirections\nRequest directions from one place to another.\nTravel mode\nSet the travel mode to get directions for walking, driving, transit, or cycling.\nWaypoints\nSpecify waypoints to return a route that includes stops at intermediate locations.\nTraffic predictions\nReturn the time estimate for a route.\nLocation modifiers\nSpecify location modifiers to indicate how drivers should approach a particular location.\nAlternative routes\nInstruct the API to return multiple routes, if available.\nExample apps\nRun live code samples on your local machine and favorite code playgrounds with the Maps JavaScript API.\ndirections\nDirections service\nUse the DirectionsService object to get directions between places.\ndirections\nText (turn-by-turn) directions\nUse the DirectionsRenderer object to display a directions panel.\ndirections\nUsing waypoints in directions\nUse the DirectionsService object to fetch directions for a route, including waypoints.\ndirections\nDraggable directions\nUse the DirectionsService object to fetch directions between draggable markers.\ndirections\nComplex directions\nUse the DirectionsService object to display data along a route.\nHelp & support\nGet help. Give help. Join the community.\nStack Overflow\n\nGet help. Give Help. Build Maps karma.\n\nIssue Tracker\n\nReport a bug or open a feature request.\n\nPlatform status\n\nFind out about platform incidents and outages.\n\nSupport\n\nGet help from the Google Maps Platform team.\n\nExcept as otherwise noted, the content of this page is licensed under the Creative Commons Attribution 4.0 License, and code samples are licensed under the Apache 2.0 License. For details, see the Google Developers Site Policies. Java is a registered trademark of Oracle and/or its affiliates.\n\nLast updated 2025-08-27 UTC.\n\nStack Overflow\nAsk a question under the google-maps tag.\nGitHub\nFork our samples and try them yourself.\nDiscord\nChat with fellow developers about Google Maps Platform.\nIssue Tracker\nSomething wrong? Send us a bug report!\nLearn More\nFAQ\nCapabilities Explorer\nAPI security best practices\nOptimizing Web Service Usage\nPlatforms\nAndroid\niOS\nWeb\nWeb Services\nProduct Info\nPricing and Plans\nContact Sales\nSupport\nTerms of Service\nAndroid\nChrome\nFirebase\nGoogle Cloud Platform\nGoogle AI\nAll products\nTerms\nPrivacy\nInfo\nChat\nAPI\nPage info\nbug_report\nfullscreen\nclose\nOn this page\nGet Started\nFeatures\nExample apps\nHelp & support"
+    },
+    "Roads API": {
+      "name": "Roads API",
+      "url": "https://developers.google.com/maps/documentation/roads",
+      "headings": [
+        "Maps Platform",
+        "Roads API\nbookmark_border",
+        "Get Started",
+        "Get started with Google Maps Platform",
+        "Make a snap to roads request",
+        "Client libraries",
+        "Roads API Inspector",
+        "Roads API Best Practices",
+        "Features",
+        "Snap to roads",
+        "Nearest roads",
+        "Advanced concepts",
+        "Help & support",
+        "Stack Overflow",
+        "Issue Tracker",
+        "Platform status",
+        "Support",
+        "Learn More",
+        "Platforms",
+        "Product Info",
+        "Page info",
+        "On this page"
+      ],
+      "endpoints": [
+        "Started</a>",
+        "https://www.googleapis.com/auth/devprofiles.full_control.firstparty",
+        "Started</span></a></li><li",
+        "Started",
+        "type=\"text\"",
+        "started",
+        "https://fonts.googleapis.com/css?family=Google+Sans:400,500|Roboto:400,400italic,500,500italic,700,700italic|Roboto+Mono:400,500,700&display=swap",
+        "help.",
+        "the",
+        "help",
+        "started\"",
+        "metadata",
+        "{",
+        "geometry",
+        "aria-activedescendant=\"\"",
+        "Started</li>",
+        "https://www.googleapis.com/auth/developerprofiles",
+        "https://www.googleapis.com/auth/developerprofiles.award",
+        "Started\""
+      ],
+      "api_methods": [],
+      "text_preview": "Skip to main content\nMaps Platform\nOverview\nProducts\nPricing\nDocumentation\nBlog\nCommunity\n/\nSign in\nWeb Services\nRoads API\nGet Started\nContact sales\nGuides\nResources\nRoads API\nOverview\nSetup\nSet up the Roads API\nDeveloper Guides\nSnap to Roads\nNearest Roads\nSpeed Limits\nAdvanced Concepts\nTroubleshooting\nRoads Inspector\nBest Practices\nWeb Service Best Practices\nClient Libraries\nRoads API\nbookmark_border\n\nIdentify the roads a vehicle is traveling along, and get metadata about those roads.\n\nGet Started \nStart building with the Roads API.\nexplore\nGet started with Google Maps Platform\nCreate an account, generate an API key, and start building.\nadd_road\nMake a snap to roads request\nGet geometry of the nearest roads for a set of latitude/longitude coordinates.\ncode\nClient libraries\nUse the Client libraries for Google Maps Web Services, to work with Google Maps Services on your server using Java, Python, Go, or Node.js.\ntravel_explore\nRoads API Inspector\nUse the Roads API Inspector to examine the results of a request in detail, interact with StreetView, and more.\nstar\nRoads API Best Practices\nLearn more about common practices which are useful for setting up your web service requests, and processing service responses.\nFeatures\nLearn about core features of the Roads API.\nSnap to roads\nGet geometry for the nearest roads for a set of latitude/longitude coordinates.\nNearest roads\nGet the closest road segments for a set of latitude/longitude coordinates.\nAdvanced concepts\nLearn more about techniques for acquiring data to use with the snap to roads feature.\nHelp & support\nGet help. Give help. Join the community.\nStack Overflow\n\nGet help. Give Help. Build Maps karma.\n\nIssue Tracker\n\nReport a bug or open a feature request.\n\nPlatform status\n\nFind out about platform incidents and outages.\n\nSupport\n\nGet help from the Google Maps Platform team.\n\nExcept as otherwise noted, the content of this page is licensed under the Creative Commons Attribution 4.0 License, and code samples are licensed under the Apache 2.0 License. For details, see the Google Developers Site Policies. Java is a registered trademark of Oracle and/or its affiliates.\n\nLast updated 2025-11-19 UTC.\n\nStack Overflow\nAsk a question under the google-maps tag.\nGitHub\nFork our samples and try them yourself.\nDiscord\nChat with fellow developers about Google Maps Platform.\nIssue Tracker\nSomething wrong? Send us a bug report!\nLearn More\nFAQ\nCapabilities Explorer\nAPI security best practices\nOptimizing Web Service Usage\nPlatforms\nAndroid\niOS\nWeb\nWeb Services\nProduct Info\nPricing and Plans\nContact Sales\nSupport\nTerms of Service\nAndroid\nChrome\nFirebase\nGoogle Cloud Platform\nGoogle AI\nAll products\nTerms\nPrivacy\nInfo\nChat\nAPI\nPage info\nbug_report\nfullscreen\nclose\nOn this page\nGet Started\nFeatures\nHelp & support"
+    },
+    "Traffic Layer": {
+      "name": "Traffic Layer",
+      "url": "https://developers.google.com/maps/documentation/javascript/trafficlayer",
+      "headings": [
+        "Traffic, Transit, and Bicycling Layers\nbookmark_border",
+        "Page Summary",
+        "Traffic Layer",
+        "Try Sample",
+        "Transit Layer",
+        "Try Sample",
+        "Bicycling Layer",
+        "Try Sample",
+        "Learn More",
+        "Platforms",
+        "Product Info",
+        "Page info",
+        "On this page"
+      ],
+      "endpoints": [
+        "Started</a>",
+        "https://www.googleapis.com/auth/devprofiles.full_control.firstparty",
+        "Started</span></a></li><li",
+        "Started</span>",
+        "alternative",
+        "started</span></a></li>",
+        "Started",
+        "type=\"text\"",
+        "started",
+        "https://fonts.googleapis.com/css?family=Google+Sans:400,500|Roboto:400,400italic,500,500italic,700,700italic|Roboto+Mono:400,500,700&display=swap",
+        "on",
+        "a",
+        "started\"",
+        "started</span></a></li><li",
+        "aria-activedescendant=\"\"",
+        "Started</li>",
+        "https://www.googleapis.com/auth/developerprofiles",
+        "(experimental)</span><span",
+        "https://www.googleapis.com/auth/developerprofiles.award"
+      ],
+      "api_methods": [],
+      "text_preview": "Skip to main content\nMaps Platform\nOverview\nProducts\nPricing\nDocumentation\nBlog\nCommunity\n/\nSign in\nWeb\nMaps JavaScript API\nGet Started\nContact sales\nGuides\nReference\nSamples\nResources\nLegacy\nMaps JavaScript API\nOverview\nSet up the JavaScript API\nUse App Check to secure your API key\nLoad the Maps JavaScript API\nError handling\nTroubleshooting\nTutorials\nAdd a Google Map with markers using HTML\nAdd a Google Map with a marker using JavaScript\nAdd a Google Map to a React app\nShow current location\nCluster markers\nConcepts\nVersioning\nLocalization\nBest practices\nTypeScript\nPromises\nBase map\nAdd a Google Map to a web page\nMap events\nMap controls\nControl zoom and pan\nRendering type (raster and vector)\nMap types\nMap color scheme\nMap and tile coordinates\nCustomize maps\nWork with 3D Maps\nOverview\nGet started\nConcepts\nBase 3D map\nMarkers\nDraw on the map\nResources\nMarkers\nOverview\nGet started\nAdd a marker to a map\nBasic marker customization\nCreate markers with graphics\nCreate markers with HTML and CSS\nControl collision behavior, altitude, and visibility\nMake markers clickable and accessible\nMake markers draggable\nMigrate to advanced markers\nMarkers (legacy)\nWork with Places\nOverview\nPlaces (New)\nPlaces UI Kit\nPlaces guides\nWork with Routes\nOverview\nGet started\nTry the demo\nRoute class\nRoute Matrix class\nMigration guides\nResources\nAddress validation\nOverview\nTry the demo\nGet started\nValidate an address\nUnderstand a basic response\nHandle the validation response\nHandle United States addresses\nCountry and region coverage\nDraw on the map\nOverview\nInfo windows\nShapes and lines\nSymbols\nWebGL Features\nDeck.gl data visualizations\nGround overlays\nCustom overlays\nDisplay data\nOverview\nData-driven styling for datasets\nData-driven styling for boundaries\nKML\nJSON\nData layer\nHeatmap (deprecated)\nTraffic, Transit, and Bicycling layers\nGrounding with Google Maps\nContextual View component (experimental)\nServices\nElevation\nGeocoding\nMaximum Zoom Imagery\nStreet View\nAdditional libraries\nOverview\nAir Quality Meter widget (experimental)\nDrawing library (deprecated)\nGeometry library\nVisualization library (deprecated)\nOpen Source libraries\nMore guides\nGoogle loader migration guide\nPlace field migration (open_now, utc_offset)\nUpgrading from v2 to v3\nreviews Places UI Kit: A ready-to-use library that provides room for customization and low-code development. Try it out, and share your input on your UI Kit experience.\nHome\nProducts\nGoogle Maps Platform\nDocumentation\nWeb\nMaps JavaScript API\nWas this helpful?\nSend feedback\nTraffic, Transit, and Bicycling Layers\nbookmark_border\nPage Summary\n\nThe Traffic, Transit, and Bicycling layers modify the base map layer to display current traffic conditions, local transit networks, or bicycling route information. These layers are available in select regions.\n\nTraffic Layer\n\nThe Maps JavaScript API allows you to add real-time traffic information (where supported) to your maps using the TrafficLayer object. Traffic information is refreshed frequently, but not instantly. Rapid consecutive requests for the same area are unlikely to yield different results.\n\nTypeScript\nJavaScript\nfunction initMap(): void {\n  const map = new google.maps.Map(\n    document.getElementById(\"map\") as HTMLElement,\n    {\n      zoom: 13,\n      center: { lat: 34.04924594193164, lng: -118.24104309082031 },\n    }\n  );\n\n  const trafficLayer = new google.maps.TrafficLayer();\n\n  trafficLayer.setMap(map);\n}\n\ndeclare global {\n  interface Window {\n    initMap: () => void;\n  }\n}\nwindow.initMap = initMap;\nindex.ts\nNote: Read the guide on using TypeScript and Google Maps.\nView example\nTry Sample\nJSFiddle.net\nGoogle Cloud Shell\nTransit Layer\n\nThe Maps JavaScript API allows you to display the public transit network of a city on your map using the TransitLayer object. When the Transit Layer is enabled, and the map is centered on a city that supports transit information, the map will display major transit lines as thick, colored lines. The color of the line is set based upon information from the transit line operator. Enabling the Transit Layer will alter the style of the base map to better emphasize transit routes.\n\nIf you’re a public agency that oversees public transportation for your city and would like your data to be included, please visit the Google Transit Partner Program site to learn more.\n\nThe following example shows the Transit layer enabled on a map of London, UK:\n\nTypeScript\nJavaScript\nfunction initMap(): void {\n  const map = new google.maps.Map(\n    document.getElementById(\"map\") as HTMLElement,\n    {\n      zoom: 13,\n      center: { lat: 51.501904, lng: -0.115871 },\n    }\n  );\n\n  const transitLayer = new google.maps.TransitLayer();\n\n  transitLayer.setMap(map);\n}\n\ndeclare global {\n  interface Window {\n    initMap: () => void;\n  }\n}\nwindow.initMap = initMap;\nindex.ts\nNote: Read the guide on using TypeScript and Google Maps.\nView example\nTry Sample\nJSFiddle.net\nGoogle Cloud Shell\nBicycling Layer\n\nThe Maps JavaScript API allows you to add bicycle in"
+    },
+    "Routes API REST Reference": {
+      "name": "Routes API REST Reference",
+      "url": "https://developers.google.com/maps/documentation/routes/reference/rest",
+      "headings": [
+        "Routes API\nbookmark_border",
+        "Page Summary",
+        "Service: routes.googleapis.com",
+        "Discovery document",
+        "Service endpoint",
+        "REST Resource: v2",
+        "Learn More",
+        "Platforms",
+        "Product Info",
+        "Page info",
+        "On this page"
+      ],
+      "endpoints": [
+        "Started</a>",
+        "aria-activedescendant=\"\"",
+        "/<wbr>distance<wbr>Matrix/<wbr>v2:compute<wbr>Route<wbr>Matrix</code>",
+        "Started</li>",
+        "https://www.googleapis.com/auth/devprofiles.full_control.firstparty",
+        "/<wbr>directions/<wbr>v2:compute<wbr>Routes</code>",
+        "started\"",
+        "https://routes.googleapis.com`,",
+        "https://www.googleapis.com/auth/developerprofiles",
+        "https://developers.google.com/discovery/v1/reference/apis",
+        "Started",
+        "type=\"text\"",
+        "https://routes.googleapis.com",
+        "https://fonts.googleapis.com/css?family=Google+Sans:400,500|Roboto:400,400italic,500,500italic,700,700italic|Roboto+Mono:400,500,700&display=swap",
+        "https://routes.googleapis.com/$discovery/rest?version=v2`",
+        "https://www.googleapis.com/auth/developerprofiles.award",
+        "https://routes.googleapis.com/$discovery/rest?version=v2"
+      ],
+      "api_methods": [
+        "computeRoutes",
+        "computeRouteMatrix",
+        "computeRoute"
+      ],
+      "text_preview": "Skip to main content\nMaps Platform\nOverview\nProducts\nPricing\nDocumentation\nBlog\nCommunity\n/\nSign in\nWeb Services\nRoutes API\nGet Started\nContact sales\nGuides\nReference\nResources\nREST reference\nOverview\nTopLevel\nTypes\nFallbackInfo\nLatLng\nLocalizedText\nLocation\nMoney\nRouteModifiers\nRouteTravelAdvisory\nRouteTravelMode\nRoutingPreference\nSpeedReadingInterval\nStatus\nTollInfo\nTrafficModel\nTransitPreferences\nUnits\nWaypoint\nRPC reference\nHome\nProducts\nGoogle Maps Platform\nDocumentation\nWeb Services\nRoutes API\nReference\nWas this helpful?\nSend feedback\nRoutes API\nbookmark_border\nPage Summary\n\nroutes.googleapis.com API.\n\nService: routes.googleapis.com\n\nTo call this service, we recommend that you use the Google-provided client libraries. If your application needs to use your own libraries to call this service, use the following information when you make the API requests.\n\nDiscovery document\n\nA Discovery Document is a machine-readable specification for describing and consuming REST APIs. It is used to build client libraries, IDE plugins, and other tools that interact with Google APIs. One service may provide multiple discovery documents. This service provides the following discovery document:\n\nhttps://routes.googleapis.com/$discovery/rest?version=v2\nService endpoint\n\nA service endpoint is a base URL that specifies the network address of an API service. One service might have multiple service endpoints. This service has the following service endpoint and all URIs below are relative to this service endpoint:\n\nhttps://routes.googleapis.com\nREST Resource: v2\nMethods\ncomputeRouteMatrix\tPOST /distanceMatrix/v2:computeRouteMatrix\nTakes in a list of origins and destinations and returns a stream containing route information for each combination of origin and destination.\ncomputeRoutes\tPOST /directions/v2:computeRoutes\nReturns the primary route along with optional alternate routes, given a set of terminal and intermediate waypoints.\nWas this helpful?\nSend feedback\n\nExcept as otherwise noted, the content of this page is licensed under the Creative Commons Attribution 4.0 License, and code samples are licensed under the Apache 2.0 License. For details, see the Google Developers Site Policies. Java is a registered trademark of Oracle and/or its affiliates.\n\nLast updated 2025-08-27 UTC.\n\nStack Overflow\nAsk a question under the google-maps tag.\nGitHub\nFork our samples and try them yourself.\nDiscord\nChat with fellow developers about Google Maps Platform.\nIssue Tracker\nSomething wrong? Send us a bug report!\nLearn More\nFAQ\nCapabilities Explorer\nAPI security best practices\nOptimizing Web Service Usage\nPlatforms\nAndroid\niOS\nWeb\nWeb Services\nProduct Info\nPricing and Plans\nContact Sales\nSupport\nTerms of Service\nAndroid\nChrome\nFirebase\nGoogle Cloud Platform\nGoogle AI\nAll products\nTerms\nPrivacy\nInfo\nChat\nAPI\nPage info\nbug_report\nfullscreen\nclose\nOn this page\nService: routes.googleapis.com\nDiscovery document\nService endpoint\nREST Resource: v2"
+    },
+    "Roads API Overview": {
+      "name": "Roads API Overview",
+      "url": "https://developers.google.com/maps/documentation/roads/overview",
+      "headings": [
+        "Roads API overview\nbookmark_border",
+        "Page Summary",
+        "Why use the Roads API",
+        "What you can do with the Roads API",
+        "How the Roads API works",
+        "Resources",
+        "How to use the Roads API",
+        "Available client libraries",
+        "What's next",
+        "Learn More",
+        "Platforms",
+        "Product Info",
+        "Page info",
+        "On this page"
+      ],
+      "endpoints": [
+        "Started</a>",
+        "https://roads.googleapis.com/v1/nearestRoads",
+        "aria-activedescendant=\"\"",
+        "Started</li>",
+        "https://www.googleapis.com/auth/devprofiles.full_control.firstparty",
+        "started\"",
+        "Started",
+        "https://www.googleapis.com/auth/developerprofiles",
+        "type=\"text\"",
+        "started",
+        "set",
+        "https://fonts.googleapis.com/css?family=Google+Sans:400,500|Roboto:400,400italic,500,500italic,700,700italic|Roboto+Mono:400,500,700&display=swap",
+        "https://www.googleapis.com/auth/developerprofiles.award",
+        "speed"
+      ],
+      "api_methods": [
+        "nearestRoads"
+      ],
+      "text_preview": "Skip to main content\nMaps Platform\nOverview\nProducts\nPricing\nDocumentation\nBlog\nCommunity\n/\nSign in\nWeb Services\nRoads API\nGet Started\nContact sales\nGuides\nResources\nRoads API\nOverview\nSetup\nSet up the Roads API\nDeveloper Guides\nSnap to Roads\nNearest Roads\nSpeed Limits\nAdvanced Concepts\nTroubleshooting\nRoads Inspector\nBest Practices\nWeb Service Best Practices\nClient Libraries\nHome\nProducts\nGoogle Maps Platform\nDocumentation\nWeb Services\nRoads API\nWas this helpful?\nSend feedback\nRoads API overview\nbookmark_border\nPage Summary\nThe Roads API is a service that accepts HTTPS requests with latitude/longitude coordinates for one or more points on a map. It uses these points to find nearby road segments and returns a Place ID along with metadata such as the nearest road segment and speed limits.\nWhy use the Roads API\n\nWith the Roads API, you can get speed limits, estimated arrival times, or other road metadata. With this road metadata, you can enhance your driving apps with the follow capabilities:\n\nConnect latitude/longitude coordinates with a road or roads.\nFind the nearest road for a set of coordinates\nGet speed limits for road segments\nWhat you can do with the Roads API\n\nWith the Roads API, you can map GPS coordinates to the geometry of the road, and determine the speed limit along road segments.\n\nSnap to Roads This service returns the most likely roads traveled based on the provided set of GPS coordinates. You can specify up to 100 GPS points collected along a route. Optionally, you can also request that the service interpolates additional points, resulting in a path that smoothly follows the geometry of the road.\nNearest Roads This service returns the nearest road segment for a GPS point. You can specify up to 100 GPS points. The points you specify don't need to be part of a continuous path.\nSpeed limits This service returns the posted speed limit for a road segment. The Speed Limit service is available to all customers with an Asset Tracking license. For Google Maps Platform Premium Plan customers who transitioned to pay-as-you-go pricing, the feature remains active.\nHow the Roads API works\n\nThe Roads API uses three endpoints which accept latitude/longitude coordinates or place IDs to provide road paths, segments, or speed limit data. The following example shows a request for nearest roads based on a set of latitude/longitude coordinates:\n\nhttps://roads.googleapis.com/v1/nearestRoads\n  ?points=60.170880%2C24.942795%7C60.170879%2C24.942796%7C60.170877%2C24.942796\n  &key=YOUR_API_KEY\nResources\n\nThe following table summarizes the resources available through the Roads API along with the data it returns.\n\nData resources\tData returned\tReturn format\nSnap to roads\t\n\nReturns an array of up to 100 GPS points from a route. Includes road-snapped longitude/latitude coordinates along with place IDs. See details in Responses in the Snap to roads guide.\n\n\t\nJSON\n\nNearest roads\t\n\nAn array of up to 100 independent latitude/longitude coordinates along with place IDs for the nearest road for each specified point. Points do not need to be continuous. See details in Responses in the Nearest roads guide.\n\n\nSpeed limits\t\n\nAn array of up to 100 road metadata elements. These contain speed limits and place IDs, with units either in KPH or MPH. See details in Responses in the Speed limits guide.\n\nHow to use the Roads API\n1\tTry the snap to roads demo\tClick the demo to create a track and see how the snap to roads endpoint provides smooth data. See Demo in the Snap to roads guide. You don't need an API key.\n2\tGet set up\tStart with Set up your Google Cloud project and complete the setup instructions that follow and then learn how to use your API key.\n3\tTry a snap to roads request\tUse one of the snap to roads examples and try one relevant to your use case.\n4\tGet speed limits for your road path\tUsing the same path data you provided for your snap to roads request, issue a speed limit query. See the Example request using a path.\n5\tLearn how to process long paths\tFollow the sections on Processing long paths in the Advanced concepts guide.\n6\tIncorporate road data into your own app!\tSee the detailed code example from the road snapped demo to start building road data functionality into your own app.\nAvailable client libraries\n\nCall this API in the language of your choice through one of the following client libraries:\n\nJava Client for Google Maps Services\nPython Client for Google Maps Services\nGo Client for Google Maps Services\nNode.js Client for Google Maps Services\n\nThe Java Client, Python Client, Go Client and Node.js Client for Google Maps Services are community-supported client libraries, open sourced under the Apache 2.0 License. Download them from GitHub, where you can also find installation instructions and sample code.\n\nWhat's next\nTry out the Roads API: Go to Roads Inspector\nLearn how to make Roads API requests: Go to the service you're interested in:\nSnap to roads\nNearest roads\nSpeed limits\nUnderstand Advanced Concepts: Go to Advanced Con"
+    },
+    "Directions API REST Reference": {
+      "name": "Directions API REST Reference",
+      "url": "https://developers.google.com/maps/documentation/directions/get-directions",
+      "headings": [
+        "Getting directions through the Directions API\nbookmark_border",
+        "Before you begin",
+        "Building your Directions API requests",
+        "Required parameters",
+        "destination",
+        "origin",
+        "Optional parameters",
+        "alternatives",
+        "arrival_time",
+        "avoid",
+        "departure_time",
+        "language",
+        "mode",
+        "region",
+        "traffic_model",
+        "transit_mode",
+        "transit_routing_preference",
+        "units",
+        "waypoints",
+        "Influence routes with stopover and pass through points",
+        "Optimize your waypoints",
+        "Directions examples",
+        "Travel modes",
+        "Traffic information",
+        "Waypoints",
+        "Specify locations in the waypoints parameter.",
+        "Influence routes with stopover and pass through points",
+        "Optimize your waypoints",
+        "Restrictions",
+        "Unit systems",
+        "Region biasing",
+        "Location Modifiers",
+        "Specify that routes must pass through a particular side of the road",
+        "Specify that routes should have a particular heading",
+        "Directions responses",
+        "DirectionsResponse",
+        "routes",
+        "status",
+        "available_travel_modes",
+        "error_message",
+        "geocoded_waypoints",
+        "DirectionsRoute",
+        "bounds",
+        "copyrights",
+        "legs",
+        "overview_polyline",
+        "summary",
+        "warnings",
+        "waypoint_order",
+        "fare",
+        "Bounds",
+        "northeast",
+        "southwest",
+        "LatLngLiteral",
+        "lat",
+        "lng",
+        "DirectionsLeg",
+        "end_address",
+        "end_location",
+        "start_address",
+        "start_location",
+        "steps",
+        "traffic_speed_entry",
+        "via_waypoint",
+        "arrival_time",
+        "departure_time",
+        "distance",
+        "duration",
+        "duration_in_traffic",
+        "DirectionsStep",
+        "duration",
+        "end_location",
+        "html_instructions",
+        "polyline",
+        "start_location",
+        "travel_mode",
+        "distance",
+        "maneuver",
+        "steps",
+        "transit_details",
+        "TextValueObject",
+        "text",
+        "value",
+        "DirectionsPolyline",
+        "points",
+        "TravelMode",
+        "DirectionsTransitDetails",
+        "arrival_stop",
+        "arrival_time",
+        "departure_stop",
+        "departure_time",
+        "headsign",
+        "headway",
+        "line",
+        "num_stops",
+        "trip_short_name",
+        "DirectionsTransitStop",
+        "location",
+        "name",
+        "TimeZoneTextValueObject",
+        "text",
+        "time_zone",
+        "value",
+        "DirectionsTransitLine",
+        "agencies",
+        "name",
+        "color",
+        "icon",
+        "short_name",
+        "text_color",
+        "url",
+        "vehicle",
+        "DirectionsTransitAgency",
+        "name",
+        "phone",
+        "url",
+        "DirectionsTransitVehicle",
+        "name",
+        "type",
+        "icon",
+        "local_icon",
+        "DirectionsTrafficSpeedEntry",
+        "offset_meters",
+        "speed_category",
+        "DirectionsViaWaypoint",
+        "location",
+        "step_index",
+        "step_interpolation",
+        "Fare",
+        "currency",
+        "text",
+        "value",
+        "DirectionsStatus",
+        "DirectionsGeocodedWaypoint",
+        "geocoder_status",
+        "partial_match",
+        "place_id",
+        "types",
+        "Learn More",
+        "Platforms",
+        "Product Info",
+        "Page info",
+        "On this page"
+      ],
+      "endpoints": [
+        "Started</a>",
+        "https://maps.googleapis.com/maps/api/directions/json?origin=H8MW%2BWP%20Kolkata%20India&destination=GCG2%2B3M%20Kolkata%20India&key=YOUR_API_KEY'",
+        "https://maps.googleapis.com/maps/api/directions/json?",
+        "https://maps.googleapis.com/maps/api/directions/json?origin=Toronto&amp;destination=Montreal&amp;key=YOUR_API_KEY'",
+        "https://maps.googleapis.com/maps/api/directions/json?origin=Toronto&destination=Montreal&avoid=highways&mode=bicycling&key=YOUR_API_KEY'",
+        "https://www.googleapis.com/auth/devprofiles.full_control.firstparty",
+        "https://maps.googleapis.com/maps/api/directions/json?origin=Toledo&amp;destination=Madrid&amp;region=es&amp;key=YOUR_API_KEY'",
+        "https://maps.googleapis.com/maps/api/directions/json?origin=Sydney%2C%20AU&destination=Perth%2C%20AU&waypoints=side_of_road%3Avia%3Aenc%3AlexeF%7B~wsZejrPjtye%40%3A&key=YOUR_API_KEY'",
+        "started</span></a></li>",
+        "https://maps.googleapis.com/maps/api/directions/json?origin=place_id%3AChIJ685WIFYViEgRHlHvBbiD5nE&destination=place_id%3AChIJA01I-8YVhkgRGJb0fW4UX7Y&key=YOUR_API_KEY'",
+        "https://maps.googleapis.com/maps/api/directions/json?origin=place_id%3AChIJ685WIFYViEgRHlHvBbiD5nE&amp;destination=place_id%3AChIJA01I-8YVhkgRGJb0fW4UX7Y&amp;key=YOUR_API_KEY'",
+        "Started",
+        "https://maps.googleapis.com/maps/api/directions/json?origin=Adelaide%2C%20SA&destination=Adelaide%2C%20SA&waypoints=optimize%3Atrue%7CBarossa%20Valley%2C%20SA%7CClare%2C%20SA%7CConnawarra%2C%20SA%7CMcLaren%20Vale%2C%20SA&key=YOUR_API_KEY'",
+        "https://maps.googleapis.com/maps/api/directions/json?origin=heading%3D90%3A37.773279%2C-122.468780&destination=37.773245%2C-122.469502&key=YOUR_API_KEY'",
+        "type=\"text\"",
+        "https://maps.googleapis.com/maps/api/directions/",
+        "https://maps.googleapis.com/maps/api/directions/json?origin=Brooklyn&amp;destination=Queens&amp;mode=transit&amp;key=YOUR_API_KEY'",
+        "https://fonts.googleapis.com/css?family=Google+Sans:400,500|Roboto:400,400italic,500,500italic,700,700italic|Roboto+Mono:400,500,700&display=swap",
+        "as",
+        "format",
+        "https://maps.googleapis.com/maps/api/directions/json?origin=Brooklyn&amp;destination=Queens&amp;mode=transit&amp;departure_time=1343641500&amp;key=YOUR_API_KEY'",
+        "https://maps.googleapis.com/maps/api/directions/json?origin=Chicago%2C%20IL&destination=Los%20Angeles%2C%20CA&waypoints=Joplin%2C%20MO%7COklahoma%20City%2C%20OK&key=YOUR_API_KEY'",
+        "https://maps.googleapis.com/maps/api/directions/json?origin=Toronto&destination=Montreal&key=YOUR_API_KEY'",
+        "https://maps.googleapis.com/maps/api/directions/json?origin=Boston%2C%20MA&destination=Concord%2C%20MA&waypoints=Charlestown%2CMA%7Cvia%3ALexington%2CMA&key=YOUR_API_KEY'",
+        "https://maps.googleapis.com/maps/api/directions/json?origin=Boston%2C%20MA&amp;destination=Concord%2C%20MA&amp;waypoints=via%3ACharlestown%2CMA%7Cvia%3ALexington%2CMA&amp;departure_time=now&amp;key=YOUR_API_KEY'",
+        "https://maps.googleapis.com/maps/api/directions/json?origin=Sydney%2C%20AU&amp;destination=Perth%2C%20AU&amp;waypoints=via%3Aenc%3AlexeF%7B~wsZejrPjtye%40%3A&amp;key=YOUR_API_KEY'",
+        "https://maps.googleapis.com/maps/api/directions/json?origin=Brooklyn&destination=Queens&mode=transit&key=YOUR_API_KEY'",
+        "https://maps.googleapis.com/maps/api/directions/json?origin=37.7680296%2C-122.4375126&destination=side_of_road%3A37.7663444%2C-122.4412006&key=YOUR_API_KEY'",
+        "started\"",
+        "https://maps.googleapis.com/maps/api/directions/json?origin=Sydney%2C%20AU&destination=Perth%2C%20AU&waypoints=via%3A-37.81223%2C144.96254%7Cvia%3A-34.92788%2C138.60008&key=YOUR_API_KEY'",
+        "https://maps.googleapis.com/maps/api/directions/json?origin=Adelaide%2C%20SA&amp;destination=Adelaide%2C%20SA&amp;waypoints=optimize%3Atrue%7CBarossa%20Valley%2C%20SA%7CClare%2C%20SA%7CConnawarra%2C%20SA%7CMcLaren%20Vale%2C%20SA&amp;key=YOUR_API_KEY'",
+        "directions</span></a></li>",
+        "https://maps.googleapis.com/maps/api/directions/json?origin=Boston%2C%20MA&destination=Concord%2C%20MA&waypoints=via%3ACharlestown%2CMA%7Cvia%3ALexington%2CMA&departure_time=now&key=YOUR_API_KEY'",
+        "https://maps.googleapis.com/maps/api/directions/json?origin=Sydney%2C%20AU&destination=Perth%2C%20AU&waypoints=via%3Aenc%3AlexeF%7B~wsZejrPjtye%40%3A&key=YOUR_API_KEY'",
+        "in",
+        "https://maps.googleapis.com/maps/api/directions/json?origin=H8MW%2BWP%20Kolkata%20India&amp;destination=GCG2%2B3M%20Kolkata%20India&amp;key=YOUR_API_KEY'",
+        "https://maps.googleapis.com/maps/api/directions/json?origin=Toledo&amp;destination=Madrid&amp;key=YOUR_API_KEY'",
+        "https://maps.googleapis.com/maps/api/directions/outputFormat?parameters",
+        "https://maps.googleapis.com/maps/api/directions/json?origin=Toledo&destination=Madrid&region=es&key=YOUR_API_KEY'",
+        "https://maps.googleapis.com/maps/api/directions/json?origin=Chicago%2C%20IL&amp;destination=Los%20Angeles%2C%20CA&amp;waypoints=Joplin%2C%20MO%7COklahoma%20City%2C%20OK&amp;key=YOUR_API_KEY'",
+        "https://maps.googleapis.com/maps/api/directions/json?origin=Boston%2C%20MA&destination=Concord%2C%20MA&waypoints=via%3ACharlestown%2CMA%7Cvia%3ALexington%2CMA&key=YOUR_API_KEY'",
+        "https://maps.googleapis.com/maps/api/directions/json?origin=Brooklyn&destination=Queens&mode=transit&departure_time=1343641500&key=YOUR_API_KEY'",
+        "https://maps.googleapis.com/maps/api/directions/json?origin=Toronto&amp;destination=Montreal&amp;avoid=highways&amp;mode=bicycling&amp;key=YOUR_API_KEY'",
+        "https://maps.googleapis.com/maps/api/directions/json?origin=Boston%2C%20MA&amp;destination=Concord%2C%20MA&amp;waypoints=via%3ACharlestown%2CMA%7Cvia%3ALexington%2CMA&amp;key=YOUR_API_KEY'",
+        "https://maps.googleapis.com/maps/api/directions/json?origin=Sydney%2C%20AU&amp;destination=Perth%2C%20AU&amp;waypoints=via%3A-37.81223%2C144.96254%7Cvia%3A-34.92788%2C138.60008&amp;key=YOUR_API_KEY'",
+        "https://maps.googleapis.com/maps/api/directions/json?origin=37.7680296%2C-122.4375126&amp;destination=side_of_road%3A37.7663444%2C-122.4412006&amp;key=YOUR_API_KEY'",
+        "https://maps.googleapis.com/maps/api/directions/json?origin=heading%3D90%3A37.773279%2C-122.468780&amp;destination=37.773245%2C-122.469502&amp;key=YOUR_API_KEY'",
+        "Started</li>",
+        "aria-activedescendant=\"\"",
+        "https://www.googleapis.com/auth/developerprofiles",
+        "https://maps.googleapis.com/maps/api/directions/json?origin=Toledo&destination=Madrid&key=YOUR_API_KEY'",
+        "(for",
+        "https://maps.googleapis.com/maps/api/directions/json?origin=Sydney%2C%20AU&amp;destination=Perth%2C%20AU&amp;waypoints=side_of_road%3Avia%3Aenc%3AlexeF%7B~wsZejrPjtye%40%3A&amp;key=YOUR_API_KEY'",
+        "https://www.googleapis.com/auth/developerprofiles.award",
+        "https://maps.googleapis.com/maps/api/directions/json?origin=Boston%2C%20MA&amp;destination=Concord%2C%20MA&amp;waypoints=Charlestown%2CMA%7Cvia%3ALexington%2CMA&amp;key=YOUR_API_KEY'",
+        "https://maps.googleapis.com/maps/api/directions/json"
+      ],
+      "api_methods": [],
+      "text_preview": "Skip to main content\nMaps Platform\nOverview\nProducts\nPricing\nDocumentation\nBlog\nCommunity\n/\nSign in\nWeb Services\nDirections API (Legacy)\nGet Started\nContact sales\nGuides\nResources\nDirections API (Legacy)\nOverview\nGet started\nSetup\nSet up your Google Cloud project\nUse API Keys\nDeveloper Guides\nGet directions\nThis product or feature is in Legacy status. For more information about Legacy status and how to migrate from Legacy to newer services, see Legacy products and features.\nHome\nProducts\nGoogle Maps Platform\nDocumentation\nWeb Services\nDirections API (Legacy)\nWas this helpful?\nSend feedback\nGetting directions through the Directions API\nbookmark_border\nEuropean Economic Area (EEA) developers\n\nFor direction calculations that respond in real time to user input (for example, within a user interface element), you can use the Directions API or, if you're using the Maps JavaScript API, use the Directions service. For server-side use, you can use Java Client, Python Client, Go Client and Node.js Client for Google Maps Services.\n\nWith the Directions API (Legacy), you can:\n\nSearch for directions for several modes of transportation, including transit, driving, walking or cycling.\nReturn multi-part directions using a series of waypoints.\nSpecify origins, destinations, and waypoints as text strings (that is, \"Chicago, IL\" or \"Darwin, NT, Australia\"), as place IDs, or as latitude/longitude coordinates.\n\nThe API returns the most efficient routes when calculating directions. Travel time is the primary factor optimized, but the API may also take into account other factors such as distance, number of turns and many more when deciding which route is the most efficient.\n\nBefore you begin\n\nBefore you start using the Directions API, you need a project with a billing account and the Directions API enabled. To learn more, see Set up in Cloud console.\n\nBuilding your Directions API requests\n\nA Directions API (Legacy) request takes the following form:\n\nhttps://maps.googleapis.com/maps/api/directions/outputFormat?parameters\n\n\nwhere outputFormat may be either of the following values:\n\njson (recommended) indicates output in JavaScript Object Notation (JSON)\nxml indicates output as XML\n\nNote: URLs must be properly encoded to be valid and are limited to 16384 characters for all web services. Be aware of this limit when constructing your URLs.\n\nAs is standard in URLs, all parameters are separated using the ampersand (&) character. All reserved characters (for example the plus sign \"+\") must be URL-encoded. The list of parameters and their possible values are enumerated below.\n\nRequired parameters\ndestination\n\nThe place ID, address, or textual latitude/longitude value to which you wish to calculate directions. The options for the destination parameter are the same as for the origin parameter.\n\norigin\n\nThe place ID, address, or textual latitude/longitude value from which you wish to calculate directions.\n\nPlace IDs must be prefixed with place_id:. You can retrieve place IDs from the Geocoding API and the Places API (including Place Autocomplete). For an example using place IDs from Place Autocomplete, see Place Autocomplete and Directions. For more about place IDs, see the Place ID overview.\n\norigin=place_id:ChIJ3S-JXmauEmsRUcIaWtf4MzE\n\n\nIf you pass an address, the Directions service geocodes the string and converts it to a latitude/longitude coordinate to calculate directions. This coordinate may be different from that returned by the Geocoding API, for example a building entrance rather than its center.\n\norigin=24+Sussex+Drive+Ottawa+ON\n\n\nUsing place IDs is preferred over using addresses or latitude/longitude coordinates. Using coordinates will always result in the point being snapped to the road nearest to those coordinates - which may not be an access point to the property, or even a road that will quickly or safely lead to the destination.\n\nIf you pass coordinates, the point will snap to the nearest road. Passing a place ID is preferred. If you do pass coordinates, ensure that no space exists between the latitude and longitude values.\n\norigin=41.43206,-81.38992\n\n\nPlus codes must be formatted as a global code or a compound code. Format plus codes as shown here (plus signs are url-escaped to %2B and spaces are url-escaped to %20).\n\nGlobal code is a 4 character area code and 6 character or longer local code (849VCWC8+R9 is 849VCWC8%2BR9).\nCompound code is a 6 character or longer local code with an explicit location (CWC8+R9 Mountain View, CA, USA is CWC8%2BR9%20Mountain%20View%20CA%20USA).\nNote: For efficiency and accuracy, use place ID's when possible. These ID's are uniquely explicit like a lat/lng value pair and provide geocoding benefits for routing such as access points and traffic variables. Unlike an address, ID's do not require the service to perform a search or an intermediate request for place details; therefore, performance is better.\nOptional parameters\nalternatives\n\nIf set to true, specifies that the Directions service may prov"
+    }
+  },
+  "api_endpoints_from_requests": [
+    {
+      "url": "https://fonts.googleapis.com/css?family=Google+Sans:400,500|Roboto:400,400italic,500,500italic,700,700italic|Roboto+Mono:400,500,700&display=swap",
+      "method": "GET",
+      "headers": {
+        "sec-ch-ua-platform": "\"Windows\"",
+        "referer": "https://developers.google.com/",
+        "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
+        "sec-ch-ua": "\"Chromium\";v=\"140\", \"Not=A?Brand\";v=\"24\", \"HeadlessChrome\";v=\"140\"",
+        "sec-ch-ua-mobile": "?0"
+      }
+    },
+    {
+      "url": "https://fonts.googleapis.com/css2?family=Material+Icons&family=Material+Symbols+Outlined&display=block",
+      "method": "GET",
+      "headers": {
+        "sec-ch-ua-platform": "\"Windows\"",
+        "referer": "https://developers.google.com/",
+        "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
+        "sec-ch-ua": "\"Chromium\";v=\"140\", \"Not=A?Brand\";v=\"24\", \"HeadlessChrome\";v=\"140\"",
+        "sec-ch-ua-mobile": "?0"
+      }
+    },
+    {
+      "url": "https://fonts.googleapis.com/css?family=Google+Sans:400,500|Roboto:400,400italic,500,500italic,700,700italic|Roboto+Mono:400,500,700&display=swap",
+      "method": "GET",
+      "headers": {
+        "sec-ch-ua-platform": "\"Windows\"",
+        "referer": "https://developers-dot-devsite-v2-prod.appspot.com/",
+        "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
+        "sec-ch-ua": "\"Chromium\";v=\"140\", \"Not=A?Brand\";v=\"24\", \"HeadlessChrome\";v=\"140\"",
+        "sec-ch-ua-mobile": "?0"
+      }
+    },
+    {
+      "url": "https://fonts.googleapis.com/css?family=Material+Icons&display=block",
+      "method": "GET",
+      "headers": {
+        "sec-ch-ua-platform": "\"Windows\"",
+        "referer": "https://developers-dot-devsite-v2-prod.appspot.com/",
+        "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
+        "sec-ch-ua": "\"Chromium\";v=\"140\", \"Not=A?Brand\";v=\"24\", \"HeadlessChrome\";v=\"140\"",
+        "sec-ch-ua-mobile": "?0"
+      }
+    },
+    {
+      "url": "https://jnn-pa.googleapis.com/$rpc/google.internal.waa.v1.Waa/GenerateIT",
+      "method": "POST",
+      "headers": {
+        "x-goog-api-key": "AIzaSyDyT5W0Jh49F30Pqqtyfdf7pDLFKLJoAnw",
+        "sec-ch-ua-platform": "\"Windows\"",
+        "referer": "https://www.youtube.com/",
+        "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
+        "sec-ch-ua": "\"Chromium\";v=\"140\", \"Not=A?Brand\";v=\"24\", \"HeadlessChrome\";v=\"140\"",
+        "content-type": "application/json+protobuf",
+        "sec-ch-ua-mobile": "?0"
+      }
+    },
+    {
+      "url": "https://jnn-pa.googleapis.com/$rpc/google.internal.waa.v1.Waa/GenerateIT",
+      "method": "POST",
+      "headers": {
+        "x-goog-api-key": "AIzaSyDyT5W0Jh49F30Pqqtyfdf7pDLFKLJoAnw",
+        "sec-ch-ua-platform": "\"Windows\"",
+        "referer": "https://www.youtube.com/",
+        "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
+        "sec-ch-ua": "\"Chromium\";v=\"140\", \"Not=A?Brand\";v=\"24\", \"HeadlessChrome\";v=\"140\"",
+        "content-type": "application/json+protobuf",
+        "sec-ch-ua-mobile": "?0"
+      }
+    },
+    {
+      "url": "https://jnn-pa.googleapis.com/$rpc/google.internal.waa.v1.Waa/GenerateIT",
+      "method": "POST",
+      "headers": {
+        "x-goog-api-key": "AIzaSyDyT5W0Jh49F30Pqqtyfdf7pDLFKLJoAnw",
+        "sec-ch-ua-platform": "\"Windows\"",
+        "referer": "https://www.youtube.com/",
+        "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
+        "sec-ch-ua": "\"Chromium\";v=\"140\", \"Not=A?Brand\";v=\"24\", \"HeadlessChrome\";v=\"140\"",
+        "content-type": "application/json+protobuf",
+        "sec-ch-ua-mobile": "?0"
+      }
+    },
+    {
+      "url": "https://jnn-pa.googleapis.com/$rpc/google.internal.waa.v1.Waa/GenerateIT",
+      "method": "POST",
+      "headers": {
+        "x-goog-api-key": "AIzaSyDyT5W0Jh49F30Pqqtyfdf7pDLFKLJoAnw",
+        "sec-ch-ua-platform": "\"Windows\"",
+        "referer": "https://www.youtube.com/",
+        "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
+        "sec-ch-ua": "\"Chromium\";v=\"140\", \"Not=A?Brand\";v=\"24\", \"HeadlessChrome\";v=\"140\"",
+        "content-type": "application/json+protobuf",
+        "sec-ch-ua-mobile": "?0"
+      }
+    },
+    {
+      "url": "https://jnn-pa.googleapis.com/$rpc/google.internal.waa.v1.Waa/GenerateIT",
+      "method": "POST",
+      "headers": {
+        "x-goog-api-key": "AIzaSyDyT5W0Jh49F30Pqqtyfdf7pDLFKLJoAnw",
+        "sec-ch-ua-platform": "\"Windows\"",
+        "referer": "https://www.youtube.com/",
+        "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
+        "sec-ch-ua": "\"Chromium\";v=\"140\", \"Not=A?Brand\";v=\"24\", \"HeadlessChrome\";v=\"140\"",
+        "content-type": "application/json+protobuf",
+        "sec-ch-ua-mobile": "?0"
+      }
+    },
+    {
+      "url": "https://jnn-pa.googleapis.com/$rpc/google.internal.waa.v1.Waa/GenerateIT",
+      "method": "POST",
+      "headers": {
+        "x-goog-api-key": "AIzaSyDyT5W0Jh49F30Pqqtyfdf7pDLFKLJoAnw",
+        "sec-ch-ua-platform": "\"Windows\"",
+        "referer": "https://www.youtube.com/",
+        "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
+        "sec-ch-ua": "\"Chromium\";v=\"140\", \"Not=A?Brand\";v=\"24\", \"HeadlessChrome\";v=\"140\"",
+        "content-type": "application/json+protobuf",
+        "sec-ch-ua-mobile": "?0"
+      }
+    },
+    {
+      "url": "https://jnn-pa.googleapis.com/$rpc/google.internal.waa.v1.Waa/GenerateIT",
+      "method": "POST",
+      "headers": {
+        "x-goog-api-key": "AIzaSyDyT5W0Jh49F30Pqqtyfdf7pDLFKLJoAnw",
+        "sec-ch-ua-platform": "\"Windows\"",
+        "referer": "https://www.youtube.com/",
+        "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
+        "sec-ch-ua": "\"Chromium\";v=\"140\", \"Not=A?Brand\";v=\"24\", \"HeadlessChrome\";v=\"140\"",
+        "content-type": "application/json+protobuf",
+        "sec-ch-ua-mobile": "?0"
+      }
+    },
+    {
+      "url": "https://jnn-pa.googleapis.com/$rpc/google.internal.waa.v1.Waa/GenerateIT",
+      "method": "POST",
+      "headers": {
+        "x-goog-api-key": "AIzaSyDyT5W0Jh49F30Pqqtyfdf7pDLFKLJoAnw",
+        "sec-ch-ua-platform": "\"Windows\"",
+        "referer": "https://www.youtube.com/",
+        "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
+        "sec-ch-ua": "\"Chromium\";v=\"140\", \"Not=A?Brand\";v=\"24\", \"HeadlessChrome\";v=\"140\"",
+        "content-type": "application/json+protobuf",
+        "sec-ch-ua-mobile": "?0"
+      }
+    },
+    {
+      "url": "https://fonts.googleapis.com/css?family=Google+Sans:400,500|Roboto:400,400italic,500,500italic,700,700italic|Roboto+Mono:400,500,700&display=swap",
+      "method": "GET",
+      "headers": {
+        "sec-ch-ua-platform": "\"Windows\"",
+        "referer": "https://developers.google.com/",
+        "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
+        "sec-ch-ua": "\"Chromium\";v=\"140\", \"Not=A?Brand\";v=\"24\", \"HeadlessChrome\";v=\"140\"",
+        "sec-ch-ua-mobile": "?0"
+      }
+    },
+    {
+      "url": "https://fonts.googleapis.com/css2?family=Material+Icons&family=Material+Symbols+Outlined&display=block",
+      "method": "GET",
+      "headers": {
+        "sec-ch-ua-platform": "\"Windows\"",
+        "referer": "https://developers.google.com/",
+        "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
+        "sec-ch-ua": "\"Chromium\";v=\"140\", \"Not=A?Brand\";v=\"24\", \"HeadlessChrome\";v=\"140\"",
+        "sec-ch-ua-mobile": "?0"
+      }
+    },
+    {
+      "url": "https://fonts.googleapis.com/css?family=Google+Sans:400,500|Roboto:400,400italic,500,500italic,700,700italic|Roboto+Mono:400,500,700&display=swap",
+      "method": "GET",
+      "headers": {
+        "sec-ch-ua-platform": "\"Windows\"",
+        "referer": "https://developers.google.com/",
+        "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
+        "sec-ch-ua": "\"Chromium\";v=\"140\", \"Not=A?Brand\";v=\"24\", \"HeadlessChrome\";v=\"140\"",
+        "sec-ch-ua-mobile": "?0"
+      }
+    },
+    {
+      "url": "https://fonts.googleapis.com/css2?family=Material+Icons&family=Material+Symbols+Outlined&display=block",
+      "method": "GET",
+      "headers": {
+        "sec-ch-ua-platform": "\"Windows\"",
+        "referer": "https://developers.google.com/",
+        "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
+        "sec-ch-ua": "\"Chromium\";v=\"140\", \"Not=A?Brand\";v=\"24\", \"HeadlessChrome\";v=\"140\"",
+        "sec-ch-ua-mobile": "?0"
+      }
+    },
+    {
+      "url": "https://fonts.googleapis.com/css?family=Google+Sans:400,500|Roboto:400,400italic,500,500italic,700,700italic|Roboto+Mono:400,500,700&display=swap",
+      "method": "GET",
+      "headers": {
+        "sec-ch-ua-platform": "\"Windows\"",
+        "referer": "https://developers.google.com/",
+        "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
+        "sec-ch-ua": "\"Chromium\";v=\"140\", \"Not=A?Brand\";v=\"24\", \"HeadlessChrome\";v=\"140\"",
+        "sec-ch-ua-mobile": "?0"
+      }
+    },
+    {
+      "url": "https://fonts.googleapis.com/css2?family=Material+Icons&family=Material+Symbols+Outlined&display=block",
+      "method": "GET",
+      "headers": {
+        "sec-ch-ua-platform": "\"Windows\"",
+        "referer": "https://developers.google.com/",
+        "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
+        "sec-ch-ua": "\"Chromium\";v=\"140\", \"Not=A?Brand\";v=\"24\", \"HeadlessChrome\";v=\"140\"",
+        "sec-ch-ua-mobile": "?0"
+      }
+    },
+    {
+      "url": "https://maps.googleapis.com/maps/api/js?key=AIzaSyB41DRUbKWJHPxaFjMAwdrzWzbVKartNGg&callback=initMap&v=weekly",
+      "method": "GET",
+      "headers": {
+        "sec-ch-ua-platform": "\"Windows\"",
+        "referer": "https://geo-devrel-javascript-samples.web.app/",
+        "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
+        "sec-ch-ua": "\"Chromium\";v=\"140\", \"Not=A?Brand\";v=\"24\", \"HeadlessChrome\";v=\"140\"",
+        "sec-ch-ua-mobile": "?0"
+      }
+    },
+    {
+      "url": "https://maps.googleapis.com/maps/api/js?key=AIzaSyB41DRUbKWJHPxaFjMAwdrzWzbVKartNGg&callback=initMap&v=weekly",
+      "method": "GET",
+      "headers": {
+        "sec-ch-ua-platform": "\"Windows\"",
+        "referer": "https://geo-devrel-javascript-samples.web.app/",
+        "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
+        "sec-ch-ua": "\"Chromium\";v=\"140\", \"Not=A?Brand\";v=\"24\", \"HeadlessChrome\";v=\"140\"",
+        "sec-ch-ua-mobile": "?0"
+      }
+    },
+    {
+      "url": "https://maps.googleapis.com/maps/api/js?key=AIzaSyB41DRUbKWJHPxaFjMAwdrzWzbVKartNGg&callback=initMap&v=weekly",
+      "method": "GET",
+      "headers": {
+        "sec-ch-ua-platform": "\"Windows\"",
+        "referer": "https://geo-devrel-javascript-samples.web.app/",
+        "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
+        "sec-ch-ua": "\"Chromium\";v=\"140\", \"Not=A?Brand\";v=\"24\", \"HeadlessChrome\";v=\"140\"",
+        "sec-ch-ua-mobile": "?0"
+      }
+    },
+    {
+      "url": "https://maps.googleapis.com/maps/api/mapsjs/gen_204?csp_test=true",
+      "method": "GET",
+      "headers": {
+        "sec-ch-ua-platform": "\"Windows\"",
+        "referer": "https://geo-devrel-javascript-samples.web.app/",
+        "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
+        "sec-ch-ua": "\"Chromium\";v=\"140\", \"Not=A?Brand\";v=\"24\", \"HeadlessChrome\";v=\"140\"",
+        "sec-ch-ua-mobile": "?0"
+      }
+    },
+    {
+      "url": "https://maps.googleapis.com/maps-api-v3/api/js/63/5d/common.js",
+      "method": "GET",
+      "headers": {
+        "sec-ch-ua-platform": "\"Windows\"",
+        "referer": "https://geo-devrel-javascript-samples.web.app/",
+        "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
+        "sec-ch-ua": "\"Chromium\";v=\"140\", \"Not=A?Brand\";v=\"24\", \"HeadlessChrome\";v=\"140\"",
+        "sec-ch-ua-mobile": "?0"
+      }
+    },
+    {
+      "url": "https://maps.googleapis.com/maps-api-v3/api/js/63/5d/util.js",
+      "method": "GET",
+      "headers": {
+        "sec-ch-ua-platform": "\"Windows\"",
+        "referer": "https://geo-devrel-javascript-samples.web.app/",
+        "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
+        "sec-ch-ua": "\"Chromium\";v=\"140\", \"Not=A?Brand\";v=\"24\", \"HeadlessChrome\";v=\"140\"",
+        "sec-ch-ua-mobile": "?0"
+      }
+    },
+    {
+      "url": "https://maps.googleapis.com/maps-api-v3/api/js/63/5d/map.js",
+      "method": "GET",
+      "headers": {
+        "sec-ch-ua-platform": "\"Windows\"",
+        "referer": "https://geo-devrel-javascript-samples.web.app/",
+        "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
+        "sec-ch-ua": "\"Chromium\";v=\"140\", \"Not=A?Brand\";v=\"24\", \"HeadlessChrome\";v=\"140\"",
+        "sec-ch-ua-mobile": "?0"
+      }
+    },
+    {
+      "url": "https://maps.googleapis.com/maps-api-v3/api/js/63/5d/layers.js",
+      "method": "GET",
+      "headers": {
+        "sec-ch-ua-platform": "\"Windows\"",
+        "referer": "https://geo-devrel-javascript-samples.web.app/",
+        "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
+        "sec-ch-ua": "\"Chromium\";v=\"140\", \"Not=A?Brand\";v=\"24\", \"HeadlessChrome\";v=\"140\"",
+        "sec-ch-ua-mobile": "?0"
+      }
+    },
+    {
+      "url": "https://maps.googleapis.com/maps/api/mapsjs/gen_204?csp_test=true",
+      "method": "GET",
+      "headers": {
+        "sec-ch-ua-platform": "\"Windows\"",
+        "referer": "https://geo-devrel-javascript-samples.web.app/",
+        "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
+        "sec-ch-ua": "\"Chromium\";v=\"140\", \"Not=A?Brand\";v=\"24\", \"HeadlessChrome\";v=\"140\"",
+        "sec-ch-ua-mobile": "?0"
+      }
+    },
+    {
+      "url": "https://maps.googleapis.com/maps-api-v3/api/js/63/5d/common.js",
+      "method": "GET",
+      "headers": {
+        "sec-ch-ua-platform": "\"Windows\"",
+        "referer": "https://geo-devrel-javascript-samples.web.app/",
+        "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
+        "sec-ch-ua": "\"Chromium\";v=\"140\", \"Not=A?Brand\";v=\"24\", \"HeadlessChrome\";v=\"140\"",
+        "sec-ch-ua-mobile": "?0"
+      }
+    },
+    {
+      "url": "https://maps.googleapis.com/maps-api-v3/api/js/63/5d/util.js",
+      "method": "GET",
+      "headers": {
+        "sec-ch-ua-platform": "\"Windows\"",
+        "referer": "https://geo-devrel-javascript-samples.web.app/",
+        "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
+        "sec-ch-ua": "\"Chromium\";v=\"140\", \"Not=A?Brand\";v=\"24\", \"HeadlessChrome\";v=\"140\"",
+        "sec-ch-ua-mobile": "?0"
+      }
+    },
+    {
+      "url": "https://maps.googleapis.com/maps-api-v3/api/js/63/5d/map.js",
+      "method": "GET",
+      "headers": {
+        "sec-ch-ua-platform": "\"Windows\"",
+        "referer": "https://geo-devrel-javascript-samples.web.app/",
+        "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
+        "sec-ch-ua": "\"Chromium\";v=\"140\", \"Not=A?Brand\";v=\"24\", \"HeadlessChrome\";v=\"140\"",
+        "sec-ch-ua-mobile": "?0"
+      }
+    },
+    {
+      "url": "https://maps.googleapis.com/maps-api-v3/api/js/63/5d/layers.js",
+      "method": "GET",
+      "headers": {
+        "sec-ch-ua-platform": "\"Windows\"",
+        "referer": "https://geo-devrel-javascript-samples.web.app/",
+        "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
+        "sec-ch-ua": "\"Chromium\";v=\"140\", \"Not=A?Brand\";v=\"24\", \"HeadlessChrome\";v=\"140\"",
+        "sec-ch-ua-mobile": "?0"
+      }
+    },
+    {
+      "url": "https://maps.googleapis.com/maps/api/mapsjs/gen_204?csp_test=true",
+      "method": "GET",
+      "headers": {
+        "sec-ch-ua-platform": "\"Windows\"",
+        "referer": "https://geo-devrel-javascript-samples.web.app/",
+        "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
+        "sec-ch-ua": "\"Chromium\";v=\"140\", \"Not=A?Brand\";v=\"24\", \"HeadlessChrome\";v=\"140\"",
+        "sec-ch-ua-mobile": "?0"
+      }
+    },
+    {
+      "url": "https://maps.googleapis.com/maps-api-v3/api/js/63/5d/common.js",
+      "method": "GET",
+      "headers": {
+        "sec-ch-ua-platform": "\"Windows\"",
+        "referer": "https://geo-devrel-javascript-samples.web.app/",
+        "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
+        "sec-ch-ua": "\"Chromium\";v=\"140\", \"Not=A?Brand\";v=\"24\", \"HeadlessChrome\";v=\"140\"",
+        "sec-ch-ua-mobile": "?0"
+      }
+    },
+    {
+      "url": "https://maps.googleapis.com/maps-api-v3/api/js/63/5d/util.js",
+      "method": "GET",
+      "headers": {
+        "sec-ch-ua-platform": "\"Windows\"",
+        "referer": "https://geo-devrel-javascript-samples.web.app/",
+        "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
+        "sec-ch-ua": "\"Chromium\";v=\"140\", \"Not=A?Brand\";v=\"24\", \"HeadlessChrome\";v=\"140\"",
+        "sec-ch-ua-mobile": "?0"
+      }
+    },
+    {
+      "url": "https://maps.googleapis.com/maps-api-v3/api/js/63/5d/map.js",
+      "method": "GET",
+      "headers": {
+        "sec-ch-ua-platform": "\"Windows\"",
+        "referer": "https://geo-devrel-javascript-samples.web.app/",
+        "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
+        "sec-ch-ua": "\"Chromium\";v=\"140\", \"Not=A?Brand\";v=\"24\", \"HeadlessChrome\";v=\"140\"",
+        "sec-ch-ua-mobile": "?0"
+      }
+    },
+    {
+      "url": "https://maps.googleapis.com/maps-api-v3/api/js/63/5d/layers.js",
+      "method": "GET",
+      "headers": {
+        "sec-ch-ua-platform": "\"Windows\"",
+        "referer": "https://geo-devrel-javascript-samples.web.app/",
+        "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
+        "sec-ch-ua": "\"Chromium\";v=\"140\", \"Not=A?Brand\";v=\"24\", \"HeadlessChrome\";v=\"140\"",
+        "sec-ch-ua-mobile": "?0"
+      }
+    },
+    {
+      "url": "https://maps.googleapis.com/maps-api-v3/api/js/63/5d/log.js",
+      "method": "GET",
+      "headers": {
+        "sec-ch-ua-platform": "\"Windows\"",
+        "referer": "https://geo-devrel-javascript-samples.web.app/",
+        "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
+        "sec-ch-ua": "\"Chromium\";v=\"140\", \"Not=A?Brand\";v=\"24\", \"HeadlessChrome\";v=\"140\"",
+        "sec-ch-ua-mobile": "?0"
+      }
+    },
+    {
+      "url": "https://maps.googleapis.com/maps-api-v3/api/js/63/5d/onion.js",
+      "method": "GET",
+      "headers": {
+        "sec-ch-ua-platform": "\"Windows\"",
+        "referer": "https://geo-devrel-javascript-samples.web.app/",
+        "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
+        "sec-ch-ua": "\"Chromium\";v=\"140\", \"Not=A?Brand\";v=\"24\", \"HeadlessChrome\";v=\"140\"",
+        "sec-ch-ua-mobile": "?0"
+      }
+    },
+    {
+      "url": "https://maps.googleapis.com/$rpc/google.internal.maps.mapsjs.v1.MapsJsInternalService/GetViewportInfo",
+      "method": "POST",
+      "headers": {
+        "x-goog-maps-api-signature": "109582",
+        "sec-ch-ua-platform": "\"Windows\"",
+        "x-user-agent": "grpc-web-javascript/0.1",
+        "referer": "https://geo-devrel-javascript-samples.web.app/",
+        "x-goog-gmp-client-signals": "CAIqBzMuNjMuNWRaDhIMCLi1g8oGEMDN1qwD",
+        "sec-ch-ua": "\"Chromium\";v=\"140\", \"Not=A?Brand\";v=\"24\", \"HeadlessChrome\";v=\"140\"",
+        "sec-ch-ua-mobile": "?0",
+        "x-goog-api-key": "AIzaSyB41DRUbKWJHPxaFjMAwdrzWzbVKartNGg",
+        "x-goog-maps-api-salt": "QtpIbgUYti",
+        "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
+        "content-type": "application/json+protobuf",
+        "x-goog-maps-session-id": "8448C0E7-6C1C-461D-B1B4-CAD97DDF6707"
+      }
+    },
+    {
+      "url": "https://maps.googleapis.com/maps/vt?pb=!1m5!1m4!1i13!2i1405!3i3271!4i256!2m3!1e0!2sm!3i761521702!2m6!1e2!2straffic!4m2!1st!2s2943096!5i1!3m13!2sen-US!3sUS!5e18!12m5!1e68!2m2!1sset!2sRoadmap!4e2!12m3!1e37!2m1!1ssmartmaps!4e0!5m1!1e3!23i46991212!23i47054750!23i47083502&key=AIzaSyB41DRUbKWJHPxaFjMAwdrzWzbVKartNGg&token=97042",
+      "method": "GET",
+      "headers": {
+        "sec-ch-ua-platform": "\"Windows\"",
+        "referer": "https://geo-devrel-javascript-samples.web.app/",
+        "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
+        "sec-ch-ua": "\"Chromium\";v=\"140\", \"Not=A?Brand\";v=\"24\", \"HeadlessChrome\";v=\"140\"",
+        "sec-ch-ua-mobile": "?0"
+      }
+    },
+    {
+      "url": "https://maps.googleapis.com/maps/vt?pb=!1m5!1m4!1i13!2i1404!3i3271!4i256!2m3!1e0!2sm!3i761521714!2m6!1e2!2straffic!4m2!1st!2s2943096!5i1!3m13!2sen-US!3sUS!5e18!12m5!1e68!2m2!1sset!2sRoadmap!4e2!12m3!1e37!2m1!1ssmartmaps!4e0!5m1!1e3!23i46991212!23i47054750!23i47083502&key=AIzaSyB41DRUbKWJHPxaFjMAwdrzWzbVKartNGg&token=53622",
+      "method": "GET",
+      "headers": {
+        "sec-ch-ua-platform": "\"Windows\"",
+        "referer": "https://geo-devrel-javascript-samples.web.app/",
+        "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
+        "sec-ch-ua": "\"Chromium\";v=\"140\", \"Not=A?Brand\";v=\"24\", \"HeadlessChrome\";v=\"140\"",
+        "sec-ch-ua-mobile": "?0"
+      }
+    },
+    {
+      "url": "https://maps.googleapis.com/maps/vt?pb=!1m5!1m4!1i13!2i1404!3i3270!4i256!2m3!1e0!2sm!3i761521714!2m6!1e2!2straffic!4m2!1st!2s2943096!5i1!3m13!2sen-US!3sUS!5e18!12m5!1e68!2m2!1sset!2sRoadmap!4e2!12m3!1e37!2m1!1ssmartmaps!4e0!5m1!1e3!23i46991212!23i47054750!23i47083502&key=AIzaSyB41DRUbKWJHPxaFjMAwdrzWzbVKartNGg&token=117269",
+      "method": "GET",
+      "headers": {
+        "sec-ch-ua-platform": "\"Windows\"",
+        "referer": "https://geo-devrel-javascript-samples.web.app/",
+        "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
+        "sec-ch-ua": "\"Chromium\";v=\"140\", \"Not=A?Brand\";v=\"24\", \"HeadlessChrome\";v=\"140\"",
+        "sec-ch-ua-mobile": "?0"
+      }
+    },
+    {
+      "url": "https://maps.googleapis.com/maps/vt?pb=!1m5!1m4!1i13!2i1405!3i3270!4i256!2m3!1e0!2sm!3i761521702!2m6!1e2!2straffic!4m2!1st!2s2943096!5i1!3m13!2sen-US!3sUS!5e18!12m5!1e68!2m2!1sset!2sRoadmap!4e2!12m3!1e37!2m1!1ssmartmaps!4e0!5m1!1e3!23i46991212!23i47054750!23i47083502&key=AIzaSyB41DRUbKWJHPxaFjMAwdrzWzbVKartNGg&token=29618",
+      "method": "GET",
+      "headers": {
+        "sec-ch-ua-platform": "\"Windows\"",
+        "referer": "https://geo-devrel-javascript-samples.web.app/",
+        "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
+        "sec-ch-ua": "\"Chromium\";v=\"140\", \"Not=A?Brand\";v=\"24\", \"HeadlessChrome\";v=\"140\"",
+        "sec-ch-ua-mobile": "?0"
+      }
+    },
+    {
+      "url": "https://maps.googleapis.com/maps/vt?pb=!1m5!1m4!1i13!2i1406!3i3270!4i256!2m3!1e0!2sm!3i761521702!2m6!1e2!2straffic!4m2!1st!2s2943096!5i1!3m13!2sen-US!3sUS!5e18!12m5!1e68!2m2!1sset!2sRoadmap!4e2!12m3!1e37!2m1!1ssmartmaps!4e0!5m1!1e3!23i46991212!23i47054750!23i47083502&key=AIzaSyB41DRUbKWJHPxaFjMAwdrzWzbVKartNGg&token=72850",
+      "method": "GET",
+      "headers": {
+        "sec-ch-ua-platform": "\"Windows\"",
+        "referer": "https://geo-devrel-javascript-samples.web.app/",
+        "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
+        "sec-ch-ua": "\"Chromium\";v=\"140\", \"Not=A?Brand\";v=\"24\", \"HeadlessChrome\";v=\"140\"",
+        "sec-ch-ua-mobile": "?0"
+      }
+    },
+    {
+      "url": "https://maps.googleapis.com/maps/vt?pb=!1m5!1m4!1i13!2i1406!3i3271!4i256!2m3!1e0!2sm!3i761521702!2m6!1e2!2straffic!4m2!1st!2s2943096!5i1!3m13!2sen-US!3sUS!5e18!12m5!1e68!2m2!1sset!2sRoadmap!4e2!12m3!1e37!2m1!1ssmartmaps!4e0!5m1!1e3!23i46991212!23i47054750!23i47083502&key=AIzaSyB41DRUbKWJHPxaFjMAwdrzWzbVKartNGg&token=9203",
+      "method": "GET",
+      "headers": {
+        "sec-ch-ua-platform": "\"Windows\"",
+        "referer": "https://geo-devrel-javascript-samples.web.app/",
+        "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
+        "sec-ch-ua": "\"Chromium\";v=\"140\", \"Not=A?Brand\";v=\"24\", \"HeadlessChrome\";v=\"140\"",
+        "sec-ch-ua-mobile": "?0"
+      }
+    },
+    {
+      "url": "https://maps.googleapis.com/maps/vt?pb=!1m5!1m4!1i13!2i1403!3i3271!4i256!2m3!1e0!2sm!3i761521714!2m6!1e2!2straffic!4m2!1st!2s2943096!5i1!3m13!2sen-US!3sUS!5e18!12m5!1e68!2m2!1sset!2sRoadmap!4e2!12m3!1e37!2m1!1ssmartmaps!4e0!5m1!1e3!23i46991212!23i47054750!23i47083502&key=AIzaSyB41DRUbKWJHPxaFjMAwdrzWzbVKartNGg&token=10390",
+      "method": "GET",
+      "headers": {
+        "sec-ch-ua-platform": "\"Windows\"",
+        "referer": "https://geo-devrel-javascript-samples.web.app/",
+        "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
+        "sec-ch-ua": "\"Chromium\";v=\"140\", \"Not=A?Brand\";v=\"24\", \"HeadlessChrome\";v=\"140\"",
+        "sec-ch-ua-mobile": "?0"
+      }
+    },
+    {
+      "url": "https://maps.googleapis.com/maps/vt?pb=!1m5!1m4!1i13!2i1403!3i3270!4i256!2m3!1e0!2sm!3i761521714!2m6!1e2!2straffic!4m2!1st!2s2943096!5i1!3m13!2sen-US!3sUS!5e18!12m5!1e68!2m2!1sset!2sRoadmap!4e2!12m3!1e37!2m1!1ssmartmaps!4e0!5m1!1e3!23i46991212!23i47054750!23i47083502&key=AIzaSyB41DRUbKWJHPxaFjMAwdrzWzbVKartNGg&token=74037",
+      "method": "GET",
+      "headers": {
+        "sec-ch-ua-platform": "\"Windows\"",
+        "referer": "https://geo-devrel-javascript-samples.web.app/",
+        "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
+        "sec-ch-ua": "\"Chromium\";v=\"140\", \"Not=A?Brand\";v=\"24\", \"HeadlessChrome\";v=\"140\"",
+        "sec-ch-ua-mobile": "?0"
+      }
+    },
+    {
+      "url": "https://maps.googleapis.com/maps/vt?pb=!1m5!1m4!1i13!2i1407!3i3270!4i256!2m3!1e0!2sm!3i761521702!2m6!1e2!2straffic!4m2!1st!2s2943096!5i1!3m13!2sen-US!3sUS!5e18!12m5!1e68!2m2!1sset!2sRoadmap!4e2!12m3!1e37!2m1!1ssmartmaps!4e0!5m1!1e3!23i46991212!23i47054750!23i47083502&key=AIzaSyB41DRUbKWJHPxaFjMAwdrzWzbVKartNGg&token=116082",
+      "method": "GET",
+      "headers": {
+        "sec-ch-ua-platform": "\"Windows\"",
+        "referer": "https://geo-devrel-javascript-samples.web.app/",
+        "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
+        "sec-ch-ua": "\"Chromium\";v=\"140\", \"Not=A?Brand\";v=\"24\", \"HeadlessChrome\";v=\"140\"",
+        "sec-ch-ua-mobile": "?0"
+      }
+    },
+    {
+      "url": "https://maps.googleapis.com/maps/vt?pb=!1m5!1m4!1i13!2i1407!3i3271!4i256!2m3!1e0!2sm!3i761521726!2m6!1e2!2straffic!4m2!1st!2s2943096!5i1!3m13!2sen-US!3sUS!5e18!12m5!1e68!2m2!1sset!2sRoadmap!4e2!12m3!1e37!2m1!1ssmartmaps!4e0!5m1!1e3!23i46991212!23i47054750!23i47083502&key=AIzaSyB41DRUbKWJHPxaFjMAwdrzWzbVKartNGg&token=52059",
+      "method": "GET",
+      "headers": {
+        "sec-ch-ua-platform": "\"Windows\"",
+        "referer": "https://geo-devrel-javascript-samples.web.app/",
+        "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
+        "sec-ch-ua": "\"Chromium\";v=\"140\", \"Not=A?Brand\";v=\"24\", \"HeadlessChrome\";v=\"140\"",
+        "sec-ch-ua-mobile": "?0"
+      }
+    },
+    {
+      "url": "https://maps.googleapis.com/maps/vt?pb=!1m4!1m3!1i13!2i1403!3i3270!1m4!1m3!1i13!2i1403!3i3271!1m4!1m3!1i13!2i1404!3i3270!1m4!1m3!1i13!2i1404!3i3271!1m4!1m3!1i13!2i1405!3i3270!1m4!1m3!1i13!2i1405!3i3271!1m4!1m3!1i13!2i1406!3i3270!1m4!1m3!1i13!2i1406!3i3271!1m4!1m3!1i13!2i1407!3i3270!1m4!1m3!1i13!2i1407!3i3271!2m3!1e0!2sm!3i761521750!2m6!1e2!2straffic!4m2!1st!2s2943096!5i1!3m13!2sen-US!3sUS!5e18!12m5!1e68!2m2!1sset!2sRoadmap!4e2!12m3!1e37!2m1!1ssmartmaps!4e3!12m1!5b1!23i46991212!23i47054750&callback=_xdc_._8q172y&key=AIzaSyB41DRUbKWJHPxaFjMAwdrzWzbVKartNGg&token=45045",
+      "method": "GET",
+      "headers": {
+        "sec-ch-ua-platform": "\"Windows\"",
+        "referer": "https://geo-devrel-javascript-samples.web.app/",
+        "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
+        "sec-ch-ua": "\"Chromium\";v=\"140\", \"Not=A?Brand\";v=\"24\", \"HeadlessChrome\";v=\"140\"",
+        "sec-ch-ua-mobile": "?0"
+      }
+    },
+    {
+      "url": "https://maps.googleapis.com/maps-api-v3/api/js/63/5d/controls.js",
+      "method": "GET",
+      "headers": {
+        "sec-ch-ua-platform": "\"Windows\"",
+        "referer": "https://geo-devrel-javascript-samples.web.app/",
+        "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
+        "sec-ch-ua": "\"Chromium\";v=\"140\", \"Not=A?Brand\";v=\"24\", \"HeadlessChrome\";v=\"140\"",
+        "sec-ch-ua-mobile": "?0"
+      }
+    },
+    {
+      "url": "https://fonts.googleapis.com/css?family=Google+Sans+Text:400&text=%E2%86%90%E2%86%92%E2%86%91%E2%86%93&lang=en",
+      "method": "GET",
+      "headers": {
+        "sec-ch-ua-platform": "\"Windows\"",
+        "referer": "https://geo-devrel-javascript-samples.web.app/",
+        "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
+        "sec-ch-ua": "\"Chromium\";v=\"140\", \"Not=A?Brand\";v=\"24\", \"HeadlessChrome\";v=\"140\"",
+        "sec-ch-ua-mobile": "?0"
+      }
+    },
+    {
+      "url": "https://fonts.googleapis.com/css?family=Roboto:300,400,500,700|Google+Sans:400,500,700|Google+Sans+Text:400,500,700&lang=en",
+      "method": "GET",
+      "headers": {
+        "sec-ch-ua-platform": "\"Windows\"",
+        "referer": "https://geo-devrel-javascript-samples.web.app/",
+        "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
+        "sec-ch-ua": "\"Chromium\";v=\"140\", \"Not=A?Brand\";v=\"24\", \"HeadlessChrome\";v=\"140\"",
+        "sec-ch-ua-mobile": "?0"
+      }
+    },
+    {
+      "url": "https://maps.googleapis.com/maps-api-v3/api/js/63/5d/marker.js",
+      "method": "GET",
+      "headers": {
+        "sec-ch-ua-platform": "\"Windows\"",
+        "referer": "https://geo-devrel-javascript-samples.web.app/",
+        "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
+        "sec-ch-ua": "\"Chromium\";v=\"140\", \"Not=A?Brand\";v=\"24\", \"HeadlessChrome\";v=\"140\"",
+        "sec-ch-ua-mobile": "?0"
+      }
+    },
+    {
+      "url": "https://fonts.googleapis.com/css?family=Google+Sans:400,500|Roboto:400,400italic,500,500italic,700,700italic|Roboto+Mono:400,500,700&display=swap",
+      "method": "GET",
+      "headers": {
+        "sec-ch-ua-platform": "\"Windows\"",
+        "referer": "https://developers.google.com/",
+        "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
+        "sec-ch-ua": "\"Chromium\";v=\"140\", \"Not=A?Brand\";v=\"24\", \"HeadlessChrome\";v=\"140\"",
+        "sec-ch-ua-mobile": "?0"
+      }
+    },
+    {
+      "url": "https://fonts.googleapis.com/css2?family=Material+Icons&family=Material+Symbols+Outlined&display=block",
+      "method": "GET",
+      "headers": {
+        "sec-ch-ua-platform": "\"Windows\"",
+        "referer": "https://developers.google.com/",
+        "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
+        "sec-ch-ua": "\"Chromium\";v=\"140\", \"Not=A?Brand\";v=\"24\", \"HeadlessChrome\";v=\"140\"",
+        "sec-ch-ua-mobile": "?0"
+      }
+    },
+    {
+      "url": "https://fonts.googleapis.com/css?family=Google+Sans:400,500|Roboto:400,400italic,500,500italic,700,700italic|Roboto+Mono:400,500,700&display=swap",
+      "method": "GET",
+      "headers": {
+        "sec-ch-ua-platform": "\"Windows\"",
+        "referer": "https://developers.google.com/",
+        "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
+        "sec-ch-ua": "\"Chromium\";v=\"140\", \"Not=A?Brand\";v=\"24\", \"HeadlessChrome\";v=\"140\"",
+        "sec-ch-ua-mobile": "?0"
+      }
+    },
+    {
+      "url": "https://fonts.googleapis.com/css2?family=Material+Icons&family=Material+Symbols+Outlined&display=block",
+      "method": "GET",
+      "headers": {
+        "sec-ch-ua-platform": "\"Windows\"",
+        "referer": "https://developers.google.com/",
+        "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
+        "sec-ch-ua": "\"Chromium\";v=\"140\", \"Not=A?Brand\";v=\"24\", \"HeadlessChrome\";v=\"140\"",
+        "sec-ch-ua-mobile": "?0"
+      }
+    },
+    {
+      "url": "https://jnn-pa.googleapis.com/$rpc/google.internal.waa.v1.Waa/GenerateIT",
+      "method": "POST",
+      "headers": {
+        "x-goog-api-key": "AIzaSyDyT5W0Jh49F30Pqqtyfdf7pDLFKLJoAnw",
+        "sec-ch-ua-platform": "\"Windows\"",
+        "referer": "https://www.youtube.com/",
+        "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
+        "sec-ch-ua": "\"Chromium\";v=\"140\", \"Not=A?Brand\";v=\"24\", \"HeadlessChrome\";v=\"140\"",
+        "content-type": "application/json+protobuf",
+        "sec-ch-ua-mobile": "?0"
+      }
+    },
+    {
+      "url": "https://fonts.googleapis.com/css?family=Google+Sans:400,500|Roboto:400,400italic,500,500italic,700,700italic|Roboto+Mono:400,500,700&display=swap",
+      "method": "GET",
+      "headers": {
+        "sec-ch-ua-platform": "\"Windows\"",
+        "referer": "https://developers.google.com/",
+        "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
+        "sec-ch-ua": "\"Chromium\";v=\"140\", \"Not=A?Brand\";v=\"24\", \"HeadlessChrome\";v=\"140\"",
+        "sec-ch-ua-mobile": "?0"
+      }
+    },
+    {
+      "url": "https://fonts.googleapis.com/css2?family=Material+Icons&family=Material+Symbols+Outlined&display=block",
+      "method": "GET",
+      "headers": {
+        "sec-ch-ua-platform": "\"Windows\"",
+        "referer": "https://developers.google.com/",
+        "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
+        "sec-ch-ua": "\"Chromium\";v=\"140\", \"Not=A?Brand\";v=\"24\", \"HeadlessChrome\";v=\"140\"",
+        "sec-ch-ua-mobile": "?0"
+      }
+    }
+  ]
+}
