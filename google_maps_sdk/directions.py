@@ -201,3 +201,7 @@ class DirectionsClient(BaseClient):
             output_format="xml",
         )
 
+    def __repr__(self) -> str:
+        """String representation of client (issue #52)"""
+        return f"{self.__class__.__name__}(api_key='***', timeout={self.timeout})"
+

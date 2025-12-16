@@ -3,6 +3,7 @@ Base client class for Google Maps Platform APIs
 """
 
 import requests
+import warnings
 from typing import Optional, Dict, Any
 from .exceptions import (
     handle_http_error,
@@ -11,6 +12,12 @@ from .exceptions import (
     QuotaExceededError,
     NotFoundError,
     InvalidRequestError,
+)
+from .utils import (
+    validate_api_key,
+    validate_base_url,
+    validate_timeout,
+    sanitize_api_key_for_logging,
 )
 
 
@@ -25,14 +32,60 @@ class BaseClient:
             api_key: Google Maps Platform API key
             base_url: Base URL for the API
             timeout: Request timeout in seconds
+
+        Raises:
+            TypeError: If api_key is not a string
+            ValueError: If api_key or base_url is invalid
         """
-        if not api_key:
-            raise ValueError("API key is required")
+        # Validate and store API key (issue #2, #6)
+        self._api_key = validate_api_key(api_key)
         
-        self.api_key = api_key
-        self.base_url = base_url.rstrip("/")
-        self.timeout = timeout
+        # Validate base URL (issue #30)
+        self.base_url = validate_base_url(base_url)
+        
+        # Validate timeout (issue #40)
+        self.timeout = validate_timeout(timeout)
+        
+        # Create session with SSL verification enforced (issue #4)
         self.session = requests.Session()
+        self.session.verify = True  # Explicitly enforce SSL verification
+        
+        # Set User-Agent header (issue #13)
+        self.session.headers.update({
+            'User-Agent': f'google-maps-sdk/{__import__("google_maps_sdk").__version__}'
+        })
+
+    @property
+    def api_key(self) -> str:
+        """
+        Get API key with warning (issue #6)
+        
+        Returns:
+            API key string
+            
+        Warns:
+            UserWarning: When API key is accessed directly
+        """
+        warnings.warn(
+            "Accessing API key directly is not recommended. "
+            "Consider using the client methods instead.",
+            UserWarning,
+            stacklevel=2
+        )
+        return self._api_key
+
+    def set_api_key(self, api_key: str) -> None:
+        """
+        Update API key (useful for key rotation) (issue #33)
+        
+        Args:
+            api_key: New API key
+            
+        Raises:
+            TypeError: If api_key is not a string
+            ValueError: If api_key is invalid
+        """
+        self._api_key = validate_api_key(api_key)
 
     def _get(self, endpoint: str, params: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
         """
@@ -53,13 +106,15 @@ class BaseClient:
         if params is None:
             params = {}
         
-        params["key"] = self.api_key
+        params["key"] = self._api_key
         
         try:
             response = self.session.get(url, params=params, timeout=self.timeout)
             return self._handle_response(response)
         except requests.exceptions.RequestException as e:
-            raise GoogleMapsAPIError(f"Request failed: {str(e)}")
+            # Sanitize error message to prevent API key exposure (issue #7)
+            error_msg = sanitize_api_key_for_logging(str(e), self._api_key)
+            raise GoogleMapsAPIError(f"Request failed: {error_msg}") from e
 
     def _post(
         self,
@@ -88,7 +143,7 @@ class BaseClient:
         if params is None:
             params = {}
         
-        params["key"] = self.api_key
+        params["key"] = self._api_key
         
         if headers is None:
             headers = {"Content-Type": "application/json"}
@@ -99,7 +154,9 @@ class BaseClient:
             )
             return self._handle_response(response)
         except requests.exceptions.RequestException as e:
-            raise GoogleMapsAPIError(f"Request failed: {str(e)}")
+            # Sanitize error message to prevent API key exposure (issue #7)
+            error_msg = sanitize_api_key_for_logging(str(e), self._api_key)
+            raise GoogleMapsAPIError(f"Request failed: {error_msg}") from e
 
     def _handle_response(self, response: requests.Response) -> Dict[str, Any]:
         """
@@ -123,30 +180,32 @@ class BaseClient:
                 raise GoogleMapsAPIError(
                     f"HTTP {response.status_code}: {response.text}",
                     status_code=response.status_code,
+                    request_url=str(response.url) if hasattr(response, 'url') else None,
                 )
             return {"status": "OK", "raw": response.text}
 
         # Check for API errors in response
         if response.status_code >= 400:
-            raise handle_http_error(response.status_code, data)
+            raise handle_http_error(response.status_code, data, response.url)
 
         # Check for Directions API status codes
         if "status" in data and data["status"] != "OK":
             status = data["status"]
             error_message = data.get("error_message", f"API returned status: {status}")
             
+            request_url = str(response.url) if hasattr(response, 'url') else None
             if status == "REQUEST_DENIED":
-                raise PermissionDeniedError(error_message, data)
+                raise PermissionDeniedError(error_message, data, request_url)
             elif status == "OVER_QUERY_LIMIT":
-                raise QuotaExceededError(error_message, data)
+                raise QuotaExceededError(error_message, data, request_url)
             elif status == "NOT_FOUND":
-                raise NotFoundError(error_message, data)
+                raise NotFoundError(error_message, data, request_url)
             elif status == "ZERO_RESULTS":
-                raise NotFoundError("No results found", data)
+                raise NotFoundError("No results found", data, request_url)
             elif status == "INVALID_REQUEST":
-                raise InvalidRequestError(error_message, data)
+                raise InvalidRequestError(error_message, data, request_url)
             else:
-                raise GoogleMapsAPIError(error_message, response=data)
+                raise GoogleMapsAPIError(error_message, response=data, request_url=request_url)
 
         return data
 
@@ -159,4 +218,8 @@ class BaseClient:
 
     def __exit__(self, exc_type, exc_val, exc_tb):
         self.close()
+
+    def __repr__(self) -> str:
+        """String representation of client (issue #52)"""
+        return f"{self.__class__.__name__}(api_key='***', base_url={self.base_url!r}, timeout={self.timeout})"
 

@@ -47,7 +47,7 @@ class TestBaseClientInit:
 
     def test_init_none_api_key(self):
         """Test initialization fails with None API key"""
-        with pytest.raises(ValueError, match="API key is required"):
+        with pytest.raises(TypeError, match="API key must be a non-empty string"):
             BaseClient(None, "https://api.example.com")
 
 
@@ -222,6 +222,7 @@ class TestBaseClientHandleResponse:
         mock_response.status_code = 400
         mock_response.json.return_value = {"error": {"message": "Bad request"}}
         mock_response.text = ""
+        mock_response.url = "https://api.example.com/test"
 
         client = BaseClient(api_key, "https://api.example.com")
         with pytest.raises(InvalidRequestError):
@@ -237,6 +238,7 @@ class TestBaseClientHandleResponse:
             "error_message": "Permission denied"
         }
         mock_response.text = ""
+        mock_response.url = "https://api.example.com/test"
 
         client = BaseClient(api_key, "https://api.example.com")
         with pytest.raises(PermissionDeniedError):
@@ -252,6 +254,7 @@ class TestBaseClientHandleResponse:
             "error_message": "Quota exceeded"
         }
         mock_response.text = ""
+        mock_response.url = "https://api.example.com/test"
 
         client = BaseClient(api_key, "https://api.example.com")
         with pytest.raises(QuotaExceededError):
@@ -267,6 +270,7 @@ class TestBaseClientHandleResponse:
             "error_message": "Not found"
         }
         mock_response.text = ""
+        mock_response.url = "https://api.example.com/test"
 
         client = BaseClient(api_key, "https://api.example.com")
         with pytest.raises(NotFoundError):
@@ -281,6 +285,7 @@ class TestBaseClientHandleResponse:
             "status": "ZERO_RESULTS"
         }
         mock_response.text = ""
+        mock_response.url = "https://api.example.com/test"
 
         client = BaseClient(api_key, "https://api.example.com")
         with pytest.raises(NotFoundError, match="No results found"):
@@ -296,6 +301,7 @@ class TestBaseClientHandleResponse:
             "error_message": "Invalid request"
         }
         mock_response.text = ""
+        mock_response.url = "https://api.example.com/test"
 
         client = BaseClient(api_key, "https://api.example.com")
         with pytest.raises(InvalidRequestError):
@@ -310,6 +316,7 @@ class TestBaseClientHandleResponse:
             "status": "UNKNOWN_STATUS"
         }
         mock_response.text = ""
+        mock_response.url = "https://api.example.com/test"
 
         client = BaseClient(api_key, "https://api.example.com")
         with pytest.raises(GoogleMapsAPIError):
@@ -322,6 +329,7 @@ class TestBaseClientHandleResponse:
         mock_response.status_code = 500
         mock_response.json.side_effect = ValueError("Not JSON")
         mock_response.text = "Internal Server Error"
+        mock_response.url = "https://api.example.com/test"
 
         client = BaseClient(api_key, "https://api.example.com")
         with pytest.raises(GoogleMapsAPIError, match="HTTP 500"):

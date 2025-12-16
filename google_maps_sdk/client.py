@@ -38,6 +38,23 @@ class GoogleMapsClient:
         self.directions = DirectionsClient(api_key, timeout)
         self.roads = RoadsClient(api_key, timeout)
 
+    def set_api_key(self, api_key: str) -> None:
+        """
+        Update API key for all sub-clients (useful for key rotation) (issue #33)
+        
+        Args:
+            api_key: New API key
+            
+        Raises:
+            TypeError: If api_key is not a string
+            ValueError: If api_key is invalid
+        """
+        from .utils import validate_api_key
+        self.api_key = validate_api_key(api_key)
+        self.routes.set_api_key(api_key)
+        self.directions.set_api_key(api_key)
+        self.roads.set_api_key(api_key)
+
     def close(self):
         """Close all HTTP sessions"""
         self.routes.close()
@@ -49,4 +66,8 @@ class GoogleMapsClient:
 
     def __exit__(self, exc_type, exc_val, exc_tb):
         self.close()
+
+    def __repr__(self) -> str:
+        """String representation of client (issue #52)"""
+        return f"{self.__class__.__name__}(api_key='***', timeout={self.timeout})"
 

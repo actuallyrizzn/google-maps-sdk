@@ -9,8 +9,8 @@ import requests
 
 @pytest.fixture
 def api_key():
-    """Test API key"""
-    return "test_api_key_12345"
+    """Test API key (must be at least 20 characters for validation)"""
+    return "test_api_key_12345678901234567890"
 
 
 @pytest.fixture

@@ -130,3 +130,7 @@ class RoadsClient(BaseClient):
 
         return self._get("/speedLimits", params=params)
 
+    def __repr__(self) -> str:
+        """String representation of client (issue #52)"""
+        return f"{self.__class__.__name__}(api_key='***', timeout={self.timeout})"
+
