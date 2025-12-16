@@ -104,3 +104,4 @@ The test suite is designed to run in CI/CD pipelines:
 - E2E tests are optional and can be skipped in CI
 - Coverage reports are generated for code quality checks
 
+

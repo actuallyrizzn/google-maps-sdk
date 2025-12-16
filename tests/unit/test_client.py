@@ -99,3 +99,4 @@ class TestGoogleMapsClientContextManager:
         mock_directions_instance.close.assert_called_once()
         mock_roads_instance.close.assert_called_once()
 
+

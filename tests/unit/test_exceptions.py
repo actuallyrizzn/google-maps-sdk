@@ -154,3 +154,4 @@ class TestHandleHttpError:
         assert isinstance(error, InvalidRequestError)
         assert error.message == "Unknown error"
 
+

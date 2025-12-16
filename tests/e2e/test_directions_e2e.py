@@ -72,3 +72,4 @@ class TestDirectionsClientE2E:
         assert result["status"] == "OK"
         client.close()
 
+

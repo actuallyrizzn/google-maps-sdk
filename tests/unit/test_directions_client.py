@@ -173,3 +173,4 @@ class TestDirectionsClientConvenienceMethods:
         )
         client.close()
 
+

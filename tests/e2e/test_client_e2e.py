@@ -56,3 +56,4 @@ class TestGoogleMapsClientE2E:
             snapped = client.roads.snap_to_roads(path)
             assert "snappedPoints" in snapped
 
+

@@ -345,3 +345,4 @@ class TestBaseClientContextManager:
         client.close()
         # Should not raise exception
 
+
