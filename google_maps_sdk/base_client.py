@@ -51,8 +51,10 @@ class BaseClient:
         self.session.verify = True  # Explicitly enforce SSL verification
         
         # Set User-Agent header (issue #13)
+        # Set Accept-Encoding header for response compression (issue #45)
         self.session.headers.update({
-            'User-Agent': f'google-maps-sdk/{__import__("google_maps_sdk").__version__}'
+            'User-Agent': f'google-maps-sdk/{__import__("google_maps_sdk").__version__}',
+            'Accept-Encoding': 'gzip, deflate, br'
         })
 
     @property
@@ -87,13 +89,14 @@ class BaseClient:
         """
         self._api_key = validate_api_key(api_key)
 
-    def _get(self, endpoint: str, params: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
+    def _get(self, endpoint: str, params: Optional[Dict[str, Any]] = None, timeout: Optional[int] = None) -> Dict[str, Any]:
         """
         Make a GET request
 
         Args:
             endpoint: API endpoint
             params: Query parameters
+            timeout: Optional timeout override (issue #12)
 
         Returns:
             Response JSON as dictionary
@@ -108,8 +111,11 @@ class BaseClient:
         
         params["key"] = self._api_key
         
+        # Use provided timeout or default (issue #12)
+        request_timeout = timeout if timeout is not None else self.timeout
+        
         try:
-            response = self.session.get(url, params=params, timeout=self.timeout)
+            response = self.session.get(url, params=params, timeout=request_timeout)
             return self._handle_response(response)
         except requests.exceptions.RequestException as e:
             # Sanitize error message to prevent API key exposure (issue #7)
@@ -122,6 +128,7 @@ class BaseClient:
         data: Optional[Dict[str, Any]] = None,
         headers: Optional[Dict[str, str]] = None,
         params: Optional[Dict[str, Any]] = None,
+        timeout: Optional[int] = None,
     ) -> Dict[str, Any]:
         """
         Make a POST request
@@ -131,6 +138,7 @@ class BaseClient:
             data: Request body data
             headers: Request headers
             params: Query parameters
+            timeout: Optional timeout override (issue #12)
 
         Returns:
             Response JSON as dictionary
@@ -148,9 +156,12 @@ class BaseClient:
         if headers is None:
             headers = {"Content-Type": "application/json"}
         
+        # Use provided timeout or default (issue #12)
+        request_timeout = timeout if timeout is not None else self.timeout
+        
         try:
             response = self.session.post(
-                url, json=data, headers=headers, params=params, timeout=self.timeout
+                url, json=data, headers=headers, params=params, timeout=request_timeout
             )
             return self._handle_response(response)
         except requests.exceptions.RequestException as e:
