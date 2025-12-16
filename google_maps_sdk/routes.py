@@ -5,6 +5,7 @@ Modern routing API with traffic-aware routing capabilities.
 """
 
 from typing import Optional, Dict, Any, List
+import requests
 from .base_client import BaseClient
 from .utils import (
     validate_waypoint_count,
@@ -35,6 +36,60 @@ class RoutesClient(BaseClient):
             timeout: Request timeout in seconds
         """
         super().__init__(api_key, self.BASE_URL, timeout)
+
+    def _post(
+        self,
+        endpoint: str,
+        data: Optional[Dict[str, Any]] = None,
+        headers: Optional[Dict[str, str]] = None,
+        params: Optional[Dict[str, Any]] = None,
+        timeout: Optional[int] = None,
+    ) -> Dict[str, Any]:
+        """
+        Make a POST request using header-based authentication (issue #1)
+        
+        Routes API uses X-Goog-Api-Key header instead of query parameter
+        for enhanced security per Google's recommendations.
+
+        Args:
+            endpoint: API endpoint
+            data: Request body data
+            headers: Request headers
+            params: Query parameters (API key will NOT be added here)
+            timeout: Optional timeout override
+
+        Returns:
+            Response JSON as dictionary
+
+        Raises:
+            GoogleMapsAPIError: If request fails
+        """
+        url = f"{self.base_url}/{endpoint.lstrip('/')}"
+        
+        if params is None:
+            params = {}
+        
+        # Routes API uses header-based auth, not query param (issue #1)
+        if headers is None:
+            headers = {"Content-Type": "application/json"}
+        
+        # Add API key to headers instead of params
+        headers["X-Goog-Api-Key"] = self._api_key
+        
+        # Use provided timeout or default
+        request_timeout = timeout if timeout is not None else self.timeout
+        
+        try:
+            response = self.session.post(
+                url, json=data, headers=headers, params=params, timeout=request_timeout
+            )
+            return self._handle_response(response)
+        except requests.exceptions.RequestException as e:
+            # Sanitize error message to prevent API key exposure
+            from .utils import sanitize_api_key_for_logging
+            error_msg = sanitize_api_key_for_logging(str(e), self._api_key)
+            from .exceptions import GoogleMapsAPIError
+            raise GoogleMapsAPIError(f"Request failed: {error_msg}") from e
 
     def compute_routes(
         self,
