@@ -39,6 +39,7 @@ class RoutesClient(BaseClient):
     def __init__(
         self, 
         api_key: Optional[str] = None, 
+        base_url: Optional[str] = None,
         timeout: int = 30,
         api_version: Optional[str] = None,
         region: Optional[str] = None,
@@ -60,6 +61,7 @@ class RoutesClient(BaseClient):
 
         Args:
             api_key: Google Maps Platform API key (optional, can use GOOGLE_MAPS_API_KEY env var) (issue #31)
+            base_url: Custom base URL for testing/staging (default: None, uses region or global) (issue #109)
             timeout: Request timeout in seconds
             api_version: API version (e.g., "v2", "v3") (default: "v2") (issue #76)
             region: Google Cloud region for regional endpoints (e.g., "us-central1", "europe-west1") (default: None for global) (issue #77)
@@ -76,9 +78,10 @@ class RoutesClient(BaseClient):
             json_encoder: Custom JSON encoder class for encoding request data (None to use default) (issue #51)
             config: ClientConfig object to centralize configuration (issue #75). If provided, other parameters are ignored.
         """
-        # If config object is provided, use it (issue #75, #76, #77)
+        # If config object is provided, use it (issue #75, #76, #77, #109)
         if config is not None:
             api_key = config.api_key
+            base_url = config.base_url if config.base_url else None
             timeout = config.timeout
             api_version = config.api_version
             region = config.region
@@ -100,19 +103,26 @@ class RoutesClient(BaseClient):
             api_version = self.DEFAULT_API_VERSION
         self._api_version = validate_api_version(api_version)
         
-        # Validate and construct base URL with region (issue #77)
-        from .utils import validate_region
-        self._region = validate_region(region)
-        if self._region:
-            # Regional endpoint: https://routes-{region}.googleapis.com
-            base_url = f"https://routes-{self._region}.googleapis.com"
+        # Construct base URL (issue #77, #109)
+        # Priority: custom base_url > region > global default
+        if base_url and base_url.strip():
+            # Use custom base URL (for testing/staging)
+            final_base_url = base_url.strip()
+            self._region = None  # Region not used when custom base_url provided
         else:
-            # Global endpoint (default)
-            base_url = self.BASE_URL_GLOBAL
+            # Validate and construct base URL with region (issue #77)
+            from .utils import validate_region
+            self._region = validate_region(region)
+            if self._region:
+                # Regional endpoint: https://routes-{region}.googleapis.com
+                final_base_url = f"https://routes-{self._region}.googleapis.com"
+            else:
+                # Global endpoint (default)
+                final_base_url = self.BASE_URL_GLOBAL
         
         super().__init__(
             api_key, 
-            base_url, 
+            final_base_url, 
             timeout,
             rate_limit_max_calls=rate_limit_max_calls,
             rate_limit_period=rate_limit_period,
