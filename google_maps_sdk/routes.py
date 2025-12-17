@@ -36,6 +36,9 @@ class RoutesClient(BaseClient):
         rate_limit_max_calls: Optional[int] = None,
         rate_limit_period: Optional[float] = None,
         retry_config: Optional[RetryConfig] = None,
+        enable_cache: bool = False,
+        cache_ttl: float = 300.0,
+        cache_maxsize: int = 100,
     ):
         """
         Initialize Routes API client
@@ -46,6 +49,9 @@ class RoutesClient(BaseClient):
             rate_limit_max_calls: Maximum calls per period for rate limiting (None to disable)
             rate_limit_period: Time period in seconds for rate limiting (default: 60.0)
             retry_config: Retry configuration (None to disable retries) (issue #11)
+            enable_cache: Enable response caching (default: False) (issue #37)
+            cache_ttl: Cache time-to-live in seconds (default: 300.0 = 5 minutes) (issue #37)
+            cache_maxsize: Maximum number of cached responses (default: 100) (issue #37)
         """
         super().__init__(
             api_key, 
@@ -54,6 +60,9 @@ class RoutesClient(BaseClient):
             rate_limit_max_calls=rate_limit_max_calls,
             rate_limit_period=rate_limit_period,
             retry_config=retry_config,
+            enable_cache=enable_cache,
+            cache_ttl=cache_ttl,
+            cache_maxsize=cache_maxsize,
         )
 
     def _post(
@@ -101,6 +110,15 @@ class RoutesClient(BaseClient):
         # Generate request ID for tracking (issue #28)
         import uuid
         request_id = str(uuid.uuid4())
+        
+        # Check cache first (issue #37)
+        if self._cache is not None:
+            from .cache import generate_cache_key
+            cache_key = generate_cache_key("POST", url, params, data)
+            cached_response = self._cache.get(cache_key)
+            if cached_response is not None:
+                self._logger.debug(f"Cache hit [ID: {request_id}]: {url}")
+                return cached_response
         
         # Log request (issue #26, #28)
         self._logger.debug(f"POST request [ID: {request_id}]: {url} with data keys: {list(data.keys()) if data else 'None'}")
@@ -155,7 +173,16 @@ class RoutesClient(BaseClient):
                 # Log response (issue #26, #28)
                 self._logger.debug(f"POST response [ID: {request_id}]: {url} - Status: {response.status_code}")
                 
-                return self._handle_response(response, request_id=request_id)
+                result = self._handle_response(response, request_id=request_id)
+                
+                # Cache successful response (issue #37)
+                if self._cache is not None and attempt == 0:  # Only cache on first successful attempt
+                    from .cache import generate_cache_key
+                    cache_key = generate_cache_key("POST", url, params, data)
+                    self._cache[cache_key] = result
+                    self._logger.debug(f"Cached response [ID: {request_id}]: {url}")
+                
+                return result
             except (requests.exceptions.Timeout, requests.exceptions.ConnectionError) as e:
                 last_exception = e
                 

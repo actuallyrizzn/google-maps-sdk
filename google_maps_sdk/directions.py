@@ -31,6 +31,9 @@ class DirectionsClient(BaseClient):
         rate_limit_max_calls: Optional[int] = None,
         rate_limit_period: Optional[float] = None,
         retry_config: Optional[RetryConfig] = None,
+        enable_cache: bool = False,
+        cache_ttl: float = 300.0,
+        cache_maxsize: int = 100,
     ):
         """
         Initialize Directions API client
@@ -41,6 +44,9 @@ class DirectionsClient(BaseClient):
             rate_limit_max_calls: Maximum calls per period for rate limiting (None to disable)
             rate_limit_period: Time period in seconds for rate limiting (default: 60.0)
             retry_config: Retry configuration (None to disable retries) (issue #11)
+            enable_cache: Enable response caching (default: False) (issue #37)
+            cache_ttl: Cache time-to-live in seconds (default: 300.0 = 5 minutes) (issue #37)
+            cache_maxsize: Maximum number of cached responses (default: 100) (issue #37)
         """
         super().__init__(
             api_key, 
@@ -49,6 +55,9 @@ class DirectionsClient(BaseClient):
             rate_limit_max_calls=rate_limit_max_calls,
             rate_limit_period=rate_limit_period,
             retry_config=retry_config,
+            enable_cache=enable_cache,
+            cache_ttl=cache_ttl,
+            cache_maxsize=cache_maxsize,
         )
 
     def get_directions(

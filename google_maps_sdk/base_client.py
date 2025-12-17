@@ -29,6 +29,7 @@ from .utils import (
 )
 from .rate_limiter import RateLimiter
 from .retry import RetryConfig, should_retry, exponential_backoff
+from .cache import TTLCache, generate_cache_key
 
 
 class BaseClient:
@@ -42,6 +43,9 @@ class BaseClient:
         rate_limit_max_calls: Optional[int] = None,
         rate_limit_period: Optional[float] = None,
         retry_config: Optional[RetryConfig] = None,
+        enable_cache: bool = False,
+        cache_ttl: float = 300.0,
+        cache_maxsize: int = 100,
     ):
         """
         Initialize base client
@@ -111,6 +115,13 @@ class BaseClient:
         # Request/response interceptors (issue #35)
         self._request_hooks: List[Callable] = []
         self._response_hooks: List[Callable] = []
+        
+        # Initialize cache (issue #37)
+        if enable_cache:
+            self._cache = TTLCache(maxsize=cache_maxsize, ttl=cache_ttl)
+            self._logger.debug(f"Cache enabled: maxsize={cache_maxsize}, ttl={cache_ttl}s")
+        else:
+            self._cache = None
 
     @property
     def api_key(self) -> str:
@@ -268,6 +279,14 @@ class BaseClient:
         # Generate request ID for tracking (issue #28)
         request_id = str(uuid.uuid4())
         
+        # Check cache first (issue #37)
+        if self._cache is not None:
+            cache_key = generate_cache_key("GET", url, params, None)
+            cached_response = self._cache.get(cache_key)
+            if cached_response is not None:
+                self._logger.debug(f"Cache hit [ID: {request_id}]: {url}")
+                return cached_response
+        
         # Log request (issue #26, #28)
         self._logger.debug(f"GET request [ID: {request_id}]: {url} with params: {sanitize_api_key_for_logging(str(params), self._api_key)}")
         
@@ -314,7 +333,15 @@ class BaseClient:
                 self._logger.debug(f"GET response [ID: {request_id}]: {url} - Status: {response.status_code}")
                 
                 # _handle_response may raise GoogleMapsAPIError for HTTP errors
-                return self._handle_response(response, request_id=request_id)
+                result = self._handle_response(response, request_id=request_id)
+                
+                # Cache successful response (issue #37)
+                if self._cache is not None and attempt == 0:  # Only cache on first successful attempt
+                    cache_key = generate_cache_key("GET", url, params, None)
+                    self._cache[cache_key] = result
+                    self._logger.debug(f"Cached response [ID: {request_id}]: {url}")
+                
+                return result
             except (requests.exceptions.Timeout, requests.exceptions.ConnectionError) as e:
                 last_exception = e
                 
@@ -445,6 +472,14 @@ class BaseClient:
         # Generate request ID for tracking (issue #28)
         request_id = str(uuid.uuid4())
         
+        # Check cache first (issue #37)
+        if self._cache is not None:
+            cache_key = generate_cache_key("POST", url, params, data)
+            cached_response = self._cache.get(cache_key)
+            if cached_response is not None:
+                self._logger.debug(f"Cache hit [ID: {request_id}]: {url}")
+                return cached_response
+        
         # Log request (issue #26, #28)
         self._logger.debug(f"POST request [ID: {request_id}]: {url} with data keys: {list(data.keys()) if data else 'None'}")
         
@@ -495,7 +530,15 @@ class BaseClient:
                 self._logger.debug(f"POST response [ID: {request_id}]: {url} - Status: {response.status_code}")
                 
                 # _handle_response may raise GoogleMapsAPIError for HTTP errors
-                return self._handle_response(response, request_id=request_id)
+                result = self._handle_response(response, request_id=request_id)
+                
+                # Cache successful response (issue #37)
+                if self._cache is not None and attempt == 0:  # Only cache on first successful attempt
+                    cache_key = generate_cache_key("POST", url, params, data)
+                    self._cache[cache_key] = result
+                    self._logger.debug(f"Cached response [ID: {request_id}]: {url}")
+                
+                return result
             except (requests.exceptions.Timeout, requests.exceptions.ConnectionError) as e:
                 last_exception = e
                 
