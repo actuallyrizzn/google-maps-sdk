@@ -106,10 +106,9 @@ class TestEdgeCases:
         with pytest.raises(ValueError, match="Timeout must be at least 1 second"):
             BaseClient(api_key, "https://example.com", timeout=0)
 
-    @patch("google_maps_sdk.base_client.requests.Session.get")
-    def test_negative_timeout(self, mock_get, api_key):
-        """Test edge case: Negative timeout value"""
-        with pytest.raises(ValueError, match="timeout must be positive"):
+    def test_negative_timeout(self, api_key):
+        """Test edge case: Negative timeout value is rejected"""
+        with pytest.raises(ValueError, match="Timeout must be at least 1 second"):
             BaseClient(api_key, "https://example.com", timeout=-1)
 
     def test_very_large_timeout(self, api_key):
