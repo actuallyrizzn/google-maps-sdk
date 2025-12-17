@@ -85,16 +85,38 @@ class GoogleMapsClient:
         self.roads.set_api_key(api_key)
 
     def close(self):
-        """Close all HTTP sessions"""
-        self.routes.close()
-        self.directions.close()
-        self.roads.close()
+        """
+        Close all HTTP sessions (idempotent) (issue #17)
+        
+        Can be called multiple times safely. If sessions are already closed,
+        this method does nothing.
+        """
+        # Close each sub-client, ignoring errors
+        for client in [self.routes, self.directions, self.roads]:
+            try:
+                if hasattr(client, 'close'):
+                    client.close()
+            except Exception:
+                # Ignore errors during cleanup
+                pass
 
     def __enter__(self):
         return self
 
     def __exit__(self, exc_type, exc_val, exc_tb):
-        self.close()
+        """
+        Exit context manager, ensuring all sessions are closed even if exceptions occur (issue #17)
+        
+        Args:
+            exc_type: Exception type (if any)
+            exc_val: Exception value (if any)
+            exc_tb: Exception traceback (if any)
+        """
+        try:
+            self.close()
+        except Exception:
+            # Ignore errors during cleanup to prevent masking original exception
+            pass
 
     def __repr__(self) -> str:
         """String representation of client (issue #52)"""

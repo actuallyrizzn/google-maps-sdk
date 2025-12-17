@@ -386,14 +386,39 @@ class BaseClient:
         return data
 
     def close(self):
-        """Close the HTTP session"""
-        self.session.close()
+        """
+        Close the HTTP session (idempotent) (issue #17)
+        
+        Can be called multiple times safely. If session is already closed,
+        this method does nothing.
+        """
+        if hasattr(self, 'session') and self.session is not None:
+            try:
+                self.session.close()
+            except Exception:
+                # Ignore errors during cleanup - session may already be closed
+                pass
+            finally:
+                # Mark session as closed to make subsequent calls idempotent
+                self.session = None
 
     def __enter__(self):
         return self
 
     def __exit__(self, exc_type, exc_val, exc_tb):
-        self.close()
+        """
+        Exit context manager, ensuring session is closed even if exceptions occur (issue #17)
+        
+        Args:
+            exc_type: Exception type (if any)
+            exc_val: Exception value (if any)
+            exc_tb: Exception traceback (if any)
+        """
+        try:
+            self.close()
+        except Exception:
+            # Ignore errors during cleanup to prevent masking original exception
+            pass
 
     def __repr__(self) -> str:
         """String representation of client (issue #52)"""
