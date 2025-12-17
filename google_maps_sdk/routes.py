@@ -4,10 +4,11 @@ Routes API Client
 Modern routing API with traffic-aware routing capabilities.
 """
 
-from typing import Optional, Dict, Any, List
+from typing import Optional, Dict, Any, List, Union
 import requests
 from .base_client import BaseClient
 from .retry import RetryConfig
+from .types import RouteResponse, RouteMatrixResponse
 from .utils import (
     validate_waypoint_count,
     validate_route_matrix_size,
@@ -178,7 +179,7 @@ class RoutesClient(BaseClient):
         polyline_encoding: Optional[str] = None,
         extra_computations: Optional[List[str]] = None,
         field_mask: Optional[str] = None,
-    ) -> Dict[str, Any]:
+    ) -> RouteResponse:
         """
         Calculate a route between an origin and destination
 
@@ -284,7 +285,7 @@ class RoutesClient(BaseClient):
         units: Optional[str] = None,
         extra_computations: Optional[List[str]] = None,
         field_mask: Optional[str] = None,
-    ) -> Dict[str, Any]:
+    ) -> RouteMatrixResponse:
         """
         Compute travel times and distances for a matrix of origin-destination pairs
 

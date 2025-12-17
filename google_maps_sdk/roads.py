@@ -4,9 +4,10 @@ Roads API Client
 Service for snapping GPS coordinates to roads and getting road metadata.
 """
 
-from typing import Optional, List, Dict, Any, Tuple
+from typing import Optional, List, Dict, Any, Tuple, Union
 from .base_client import BaseClient
 from .retry import RetryConfig
+from .types import SnapToRoadsResponse, NearestRoadsResponse, SpeedLimitsResponse
 from .utils import validate_path_or_points, MAX_ROADS_POINTS
 
 
@@ -46,7 +47,7 @@ class RoadsClient(BaseClient):
         self,
         path: List[tuple],
         interpolate: bool = False,
-    ) -> Dict[str, Any]:
+    ) -> SnapToRoadsResponse:
         """
         Snap a GPS path to the most likely roads traveled
 
@@ -78,7 +79,7 @@ class RoadsClient(BaseClient):
     def nearest_roads(
         self,
         points: List[tuple],
-    ) -> Dict[str, Any]:
+    ) -> NearestRoadsResponse:
         """
         Find the nearest road segments for a set of GPS points
 
@@ -108,7 +109,7 @@ class RoadsClient(BaseClient):
         self,
         path: Optional[List[tuple]] = None,
         place_ids: Optional[List[str]] = None,
-    ) -> Dict[str, Any]:
+    ) -> SpeedLimitsResponse:
         """
         Get posted speed limits for road segments
 

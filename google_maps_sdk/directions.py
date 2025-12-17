@@ -7,6 +7,7 @@ Legacy directions service. Consider migrating to Routes API for new projects.
 from typing import Optional, Dict, Any, List, Union
 from .base_client import BaseClient
 from .retry import RetryConfig
+from .types import DirectionsResponse
 from .utils import (
     validate_waypoint_count,
     validate_language_code,
@@ -67,7 +68,7 @@ class DirectionsClient(BaseClient):
         transit_mode: Optional[List[str]] = None,
         transit_routing_preference: Optional[str] = None,
         output_format: str = "json",
-    ) -> Dict[str, Any]:
+    ) -> DirectionsResponse:
         """
         Get directions between two locations
 
