@@ -19,7 +19,7 @@ if TYPE_CHECKING:
 class RoadsClient(BaseClient):
     """Client for Google Maps Roads API"""
 
-    BASE_URL = "https://roads.googleapis.com"
+    BASE_URL_GLOBAL = "https://roads.googleapis.com"
     DEFAULT_API_VERSION = "v1"
 
     def __init__(
@@ -27,6 +27,7 @@ class RoadsClient(BaseClient):
         api_key: Optional[str] = None, 
         timeout: int = 30,
         api_version: Optional[str] = None,
+        region: Optional[str] = None,
         rate_limit_max_calls: Optional[int] = None,
         rate_limit_period: Optional[float] = None,
         retry_config: Optional[RetryConfig] = None,
@@ -47,6 +48,7 @@ class RoadsClient(BaseClient):
             api_key: Google Maps Platform API key (optional, can use GOOGLE_MAPS_API_KEY env var) (issue #31)
             timeout: Request timeout in seconds
             api_version: API version (e.g., "v1", "v2") (default: "v1") (issue #76)
+            region: Google Cloud region for regional endpoints (e.g., "us-central1", "europe-west1") (default: None for global) (issue #77)
             rate_limit_max_calls: Maximum calls per period for rate limiting (None to disable)
             rate_limit_period: Time period in seconds for rate limiting (default: 60.0)
             retry_config: Retry configuration (None to disable retries) (issue #11)
@@ -60,11 +62,12 @@ class RoadsClient(BaseClient):
             json_encoder: Custom JSON encoder class for encoding request data (None to use default) (issue #51)
             config: ClientConfig object to centralize configuration (issue #75). If provided, other parameters are ignored.
         """
-        # If config object is provided, use it (issue #75, #76)
+        # If config object is provided, use it (issue #75, #76, #77)
         if config is not None:
             api_key = config.api_key
             timeout = config.timeout
             api_version = config.api_version
+            region = config.region
             rate_limit_max_calls = config.rate_limit_max_calls
             rate_limit_period = config.rate_limit_period
             retry_config = config.retry_config
@@ -83,8 +86,18 @@ class RoadsClient(BaseClient):
             api_version = self.DEFAULT_API_VERSION
         self._api_version = validate_api_version(api_version)
         
+        # Validate and construct base URL with region (issue #77)
+        from .utils import validate_region
+        self._region = validate_region(region)
+        if self._region:
+            # Regional endpoint: https://roads-{region}.googleapis.com
+            base_url_with_region = f"https://roads-{self._region}.googleapis.com"
+        else:
+            # Global endpoint (default)
+            base_url_with_region = self.BASE_URL_GLOBAL
+        
         # Construct base URL with version
-        base_url_with_version = f"{self.BASE_URL}/{self._api_version}"
+        base_url_with_version = f"{base_url_with_region}/{self._api_version}"
         
         super().__init__(
             api_key, 

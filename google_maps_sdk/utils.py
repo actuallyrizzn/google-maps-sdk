@@ -474,6 +474,43 @@ def validate_api_version(api_version: Optional[str]) -> Optional[str]:
     return api_version.lower()  # Normalize to lowercase
 
 
+def validate_region(region: Optional[str]) -> Optional[str]:
+    """
+    Validate Google Cloud region format (issue #77)
+    
+    Args:
+        region: Region string (e.g., "us-central1", "europe-west1", "asia-east1")
+        
+    Returns:
+        Validated region string (lowercase)
+        
+    Raises:
+        ValueError: If region format is invalid
+    """
+    if region is None:
+        return None
+    
+    if not isinstance(region, str):
+        raise TypeError("Region must be a string")
+    
+    region = region.strip().lower()
+    
+    if not region:
+        raise ValueError("Region cannot be empty or whitespace-only")
+    
+    # Validate format: should match Google Cloud region pattern
+    # Format: {location}-{number} (e.g., us-central1, europe-west1)
+    region_pattern = re.compile(r'^[a-z]+-[a-z0-9]+[0-9]+$')
+    
+    if not region_pattern.match(region):
+        raise ValueError(
+            f"Invalid region format: {region}. "
+            f"Expected format: 'us-central1', 'europe-west1', 'asia-east1', etc."
+        )
+    
+    return region
+
+
 def validate_units(units: Optional[str]) -> Optional[str]:
     """
     Validate units parameter (issue #44)

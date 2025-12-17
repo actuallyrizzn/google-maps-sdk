@@ -22,6 +22,7 @@ class ClientConfig:
         base_url: Base URL for the API (default: empty string)
         timeout: Request timeout in seconds (default: 30)
         api_version: API version string (e.g., "v1", "v2") (default: None, uses client default)
+        region: Google Cloud region for regional endpoints (e.g., "us-central1", "europe-west1") (default: None for global) (issue #77)
         rate_limit_max_calls: Maximum calls per period for rate limiting (None to disable)
         rate_limit_period: Time period in seconds for rate limiting (default: 60.0)
         retry_config: Retry configuration (None to disable retries)
@@ -38,6 +39,7 @@ class ClientConfig:
     base_url: str = ""
     timeout: int = 30
     api_version: Optional[str] = None
+    region: Optional[str] = None
     rate_limit_max_calls: Optional[int] = None
     rate_limit_period: Optional[float] = None
     retry_config: Optional[RetryConfig] = None
@@ -62,6 +64,7 @@ class ClientConfig:
             'base_url': self.base_url,
             'timeout': self.timeout,
             'api_version': self.api_version,
+            'region': self.region,
             'rate_limit_max_calls': self.rate_limit_max_calls,
             'rate_limit_period': self.rate_limit_period,
             'retry_config': self.retry_config,
@@ -100,6 +103,7 @@ class ClientConfig:
             base_url=self.base_url,
             timeout=self.timeout,
             api_version=self.api_version,
+            region=self.region,
             rate_limit_max_calls=self.rate_limit_max_calls,
             rate_limit_period=self.rate_limit_period,
             retry_config=self.retry_config,

@@ -33,7 +33,7 @@ from .utils import (
 class RoutesClient(BaseClient):
     """Client for Google Maps Routes API"""
 
-    BASE_URL = "https://routes.googleapis.com"
+    BASE_URL_GLOBAL = "https://routes.googleapis.com"
     DEFAULT_API_VERSION = "v2"
 
     def __init__(
@@ -41,6 +41,7 @@ class RoutesClient(BaseClient):
         api_key: Optional[str] = None, 
         timeout: int = 30,
         api_version: Optional[str] = None,
+        region: Optional[str] = None,
         rate_limit_max_calls: Optional[int] = None,
         rate_limit_period: Optional[float] = None,
         retry_config: Optional[RetryConfig] = None,
@@ -61,6 +62,7 @@ class RoutesClient(BaseClient):
             api_key: Google Maps Platform API key (optional, can use GOOGLE_MAPS_API_KEY env var) (issue #31)
             timeout: Request timeout in seconds
             api_version: API version (e.g., "v2", "v3") (default: "v2") (issue #76)
+            region: Google Cloud region for regional endpoints (e.g., "us-central1", "europe-west1") (default: None for global) (issue #77)
             rate_limit_max_calls: Maximum calls per period for rate limiting (None to disable)
             rate_limit_period: Time period in seconds for rate limiting (default: 60.0)
             retry_config: Retry configuration (None to disable retries) (issue #11)
@@ -74,11 +76,12 @@ class RoutesClient(BaseClient):
             json_encoder: Custom JSON encoder class for encoding request data (None to use default) (issue #51)
             config: ClientConfig object to centralize configuration (issue #75). If provided, other parameters are ignored.
         """
-        # If config object is provided, use it (issue #75, #76)
+        # If config object is provided, use it (issue #75, #76, #77)
         if config is not None:
             api_key = config.api_key
             timeout = config.timeout
             api_version = config.api_version
+            region = config.region
             rate_limit_max_calls = config.rate_limit_max_calls
             rate_limit_period = config.rate_limit_period
             retry_config = config.retry_config
@@ -97,9 +100,19 @@ class RoutesClient(BaseClient):
             api_version = self.DEFAULT_API_VERSION
         self._api_version = validate_api_version(api_version)
         
+        # Validate and construct base URL with region (issue #77)
+        from .utils import validate_region
+        self._region = validate_region(region)
+        if self._region:
+            # Regional endpoint: https://routes-{region}.googleapis.com
+            base_url = f"https://routes-{self._region}.googleapis.com"
+        else:
+            # Global endpoint (default)
+            base_url = self.BASE_URL_GLOBAL
+        
         super().__init__(
             api_key, 
-            self.BASE_URL, 
+            base_url, 
             timeout,
             rate_limit_max_calls=rate_limit_max_calls,
             rate_limit_period=rate_limit_period,
