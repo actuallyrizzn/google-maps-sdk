@@ -710,45 +710,71 @@ class BaseClient:
         else:
             return _make_request()
 
-    def _handle_response(self, response: requests.Response, request_id: Optional[str] = None) -> Dict[str, Any]:
+    def _parse_response(self, response: requests.Response) -> Dict[str, Any]:
         """
-        Handle HTTP response and convert to appropriate format (issue #28)
-
+        Parse HTTP response into dictionary format (issue #78)
+        
+        Separates response parsing from error handling for better testability.
+        
         Args:
             response: HTTP response object
-            request_id: Optional request ID for correlation
-
+            
         Returns:
-            Response JSON as dictionary
-
+            Parsed response as dictionary
+            
         Raises:
-            GoogleMapsAPIError: If response indicates an error
+            ValueError: If response cannot be parsed
         """
         # Determine content type (issue #29)
         content_type = response.headers.get('Content-Type', '').lower()
         is_xml = 'xml' in content_type
-        is_json = 'json' in content_type or not content_type  # Default to JSON if no content-type
         
         # Try to parse JSON
         try:
             if is_xml:
                 # Handle XML response (issue #29)
                 xml_response = XMLResponse(response.text, response.status_code)
-                if response.status_code >= 400:
-                    error = GoogleMapsAPIError(
-                        f"HTTP {response.status_code}: XML error response",
-                        status_code=response.status_code,
-                        request_url=str(response.url) if hasattr(response, 'url') else None,
-                        request_id=request_id,
-                    )
-                    raise error
-                # Return structured XML response
                 return xml_response.to_dict()
             
             data = response.json()
+            return data
         except ValueError:
             # Not JSON and not XML - handle as non-JSON response (issue #29)
-            if response.status_code >= 400:
+            non_json_response = NonJSONResponse(
+                response.text,
+                content_type=content_type,
+                status_code=response.status_code
+            )
+            return non_json_response.to_dict()
+    
+    def _check_http_errors(self, response: requests.Response, data: Dict[str, Any], request_id: Optional[str] = None) -> None:
+        """
+        Check for HTTP errors and raise appropriate exceptions (issue #78)
+        
+        Separates HTTP error checking from response parsing for better testability.
+        
+        Args:
+            response: HTTP response object
+            data: Parsed response data
+            request_id: Optional request ID for correlation
+            
+        Raises:
+            GoogleMapsAPIError: If HTTP error is detected
+        """
+        if response.status_code >= 400:
+            # Handle XML error responses
+            content_type = response.headers.get('Content-Type', '').lower()
+            if 'xml' in content_type:
+                error = GoogleMapsAPIError(
+                    f"HTTP {response.status_code}: XML error response",
+                    status_code=response.status_code,
+                    request_url=str(response.url) if hasattr(response, 'url') else None,
+                    request_id=request_id,
+                )
+                raise error
+            
+            # Handle non-JSON error responses
+            if not isinstance(data, dict) or "error" not in data:
                 error = GoogleMapsAPIError(
                     f"HTTP {response.status_code}: {response.text}",
                     status_code=response.status_code,
@@ -757,21 +783,26 @@ class BaseClient:
                 )
                 raise error
             
-            # Success response that's not JSON
-            non_json_response = NonJSONResponse(
-                response.text,
-                content_type=content_type,
-                status_code=response.status_code
-            )
-            return non_json_response.to_dict()
-
-        # Check for API errors in response
-        if response.status_code >= 400:
+            # Handle JSON error responses
             self._logger.warning(f"HTTP error {response.status_code} for {response.url} [ID: {request_id or 'N/A'}]: {sanitize_api_key_for_logging(str(data), self._api_key)}")
             raise handle_http_error(response.status_code, data, response.url, request_id=request_id)
-
+    
+    def _check_directions_api_errors(self, data: Dict[str, Any], response: requests.Response, request_id: Optional[str] = None) -> None:
+        """
+        Check for Directions API status codes and raise appropriate exceptions (issue #78)
+        
+        Separates Directions API error checking from response parsing for better testability.
+        
+        Args:
+            data: Parsed response data
+            response: HTTP response object
+            request_id: Optional request ID for correlation
+            
+        Raises:
+            GoogleMapsAPIError: If Directions API error is detected
+        """
         # Check for Directions API status codes
-        if "status" in data and data["status"] != "OK":
+        if isinstance(data, dict) and "status" in data and data["status"] != "OK":
             status = data["status"]
             error_message = data.get("error_message", f"API returned status: {status}")
             
@@ -788,6 +819,29 @@ class BaseClient:
                 raise InvalidRequestError(error_message, data, request_url, request_id=request_id)
             else:
                 raise GoogleMapsAPIError(error_message, response=data, request_url=request_url, request_id=request_id)
+
+    def _handle_response(self, response: requests.Response, request_id: Optional[str] = None) -> Dict[str, Any]:
+        """
+        Handle HTTP response and convert to appropriate format (issue #28, #78)
+
+        Args:
+            response: HTTP response object
+            request_id: Optional request ID for correlation
+
+        Returns:
+            Response JSON as dictionary
+
+        Raises:
+            GoogleMapsAPIError: If response indicates an error
+        """
+        # Parse response (issue #78)
+        data = self._parse_response(response)
+        
+        # Check for HTTP errors (issue #78)
+        self._check_http_errors(response, data, request_id=request_id)
+        
+        # Check for Directions API errors (issue #78)
+        self._check_directions_api_errors(data, response, request_id=request_id)
 
         return data
 
