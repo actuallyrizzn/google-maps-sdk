@@ -11,6 +11,7 @@ import uuid
 from typing import Optional, Dict, Any
 from requests.adapters import HTTPAdapter
 from urllib3.util.retry import Retry
+from .response_types import XMLResponse, NonJSONResponse
 from .exceptions import (
     handle_http_error,
     GoogleMapsAPIError,
@@ -453,11 +454,30 @@ class BaseClient:
         Raises:
             GoogleMapsAPIError: If response indicates an error
         """
+        # Determine content type (issue #29)
+        content_type = response.headers.get('Content-Type', '').lower()
+        is_xml = 'xml' in content_type
+        is_json = 'json' in content_type or not content_type  # Default to JSON if no content-type
+        
         # Try to parse JSON
         try:
+            if is_xml:
+                # Handle XML response (issue #29)
+                xml_response = XMLResponse(response.text, response.status_code)
+                if response.status_code >= 400:
+                    error = GoogleMapsAPIError(
+                        f"HTTP {response.status_code}: XML error response",
+                        status_code=response.status_code,
+                        request_url=str(response.url) if hasattr(response, 'url') else None,
+                        request_id=request_id,
+                    )
+                    raise error
+                # Return structured XML response
+                return xml_response.to_dict()
+            
             data = response.json()
         except ValueError:
-            # If not JSON, check status code
+            # Not JSON and not XML - handle as non-JSON response (issue #29)
             if response.status_code >= 400:
                 error = GoogleMapsAPIError(
                     f"HTTP {response.status_code}: {response.text}",
@@ -466,7 +486,14 @@ class BaseClient:
                     request_id=request_id,
                 )
                 raise error
-            return {"status": "OK", "raw": response.text}
+            
+            # Success response that's not JSON
+            non_json_response = NonJSONResponse(
+                response.text,
+                content_type=content_type,
+                status_code=response.status_code
+            )
+            return non_json_response.to_dict()
 
         # Check for API errors in response
         if response.status_code >= 400:
