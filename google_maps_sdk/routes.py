@@ -105,6 +105,15 @@ class RoutesClient(BaseClient):
         # Log request (issue #26, #28)
         self._logger.debug(f"POST request [ID: {request_id}]: {url} with data keys: {list(data.keys()) if data else 'None'}")
         
+        # Call request hooks (issue #35)
+        headers_with_id = headers.copy() if headers else {}
+        headers_with_id['X-Request-ID'] = request_id
+        for hook in self._request_hooks:
+            try:
+                hook("POST", url, headers_with_id, params, data)
+            except Exception as e:
+                self._logger.warning(f"Request hook raised exception: {e}", exc_info=True)
+        
         # Retry logic (issue #11) - RoutesClient has its own _post, so we need retry here too
         from .retry import should_retry, exponential_backoff
         import time
@@ -121,15 +130,27 @@ class RoutesClient(BaseClient):
                 request_id = str(uuid.uuid4())
                 last_request_id = request_id
                 self._logger.info(f"Retry attempt {attempt}/{max_retries} for POST {url} [ID: {request_id}]")
-            
-            try:
-                # Add request ID to headers (issue #28)
+                # Update headers with new request ID
                 headers_with_id = headers.copy() if headers else {}
                 headers_with_id['X-Request-ID'] = request_id
-                
+                # Call request hooks for retry (issue #35)
+                for hook in self._request_hooks:
+                    try:
+                        hook("POST", url, headers_with_id, params, data)
+                    except Exception as e:
+                        self._logger.warning(f"Request hook raised exception: {e}", exc_info=True)
+            
+            try:
                 response = self.session.post(
                     url, json=data, headers=headers_with_id, params=params, timeout=request_timeout
                 )
+                
+                # Call response hooks (issue #35)
+                for hook in self._response_hooks:
+                    try:
+                        hook(response)
+                    except Exception as e:
+                        self._logger.warning(f"Response hook raised exception: {e}", exc_info=True)
                 
                 # Log response (issue #26, #28)
                 self._logger.debug(f"POST response [ID: {request_id}]: {url} - Status: {response.status_code}")

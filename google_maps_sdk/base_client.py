@@ -9,7 +9,7 @@ import threading
 import logging
 import uuid
 import os
-from typing import Optional, Dict, Any
+from typing import Optional, Dict, Any, Callable, List
 from requests.adapters import HTTPAdapter
 from urllib3.util.retry import Retry
 from .response_types import XMLResponse, NonJSONResponse
@@ -107,6 +107,10 @@ class BaseClient:
         
         # Initialize logger (issue #26)
         self._logger = logging.getLogger(f"{__name__}.{self.__class__.__name__}")
+        
+        # Request/response interceptors (issue #35)
+        self._request_hooks: List[Callable] = []
+        self._response_hooks: List[Callable] = []
 
     @property
     def api_key(self) -> str:
@@ -167,6 +171,70 @@ class BaseClient:
         """
         self._api_key = validate_api_key(api_key)
 
+    def add_request_hook(self, hook: Callable) -> None:
+        """
+        Add a hook to be called before each request (issue #35)
+        
+        The hook will be called with: (method, url, headers, params, data)
+        
+        Args:
+            hook: Callable that takes (method, url, headers, params, data) as arguments
+            
+        Example:
+            >>> def log_request(method, url, headers, params, data):
+            ...     print(f"Making {method} request to {url}")
+            >>> client.add_request_hook(log_request)
+        """
+        if not callable(hook):
+            raise TypeError("Hook must be callable")
+        self._request_hooks.append(hook)
+
+    def add_response_hook(self, hook: Callable) -> None:
+        """
+        Add a hook to be called after each response (issue #35)
+        
+        The hook will be called with: (response)
+        
+        Args:
+            hook: Callable that takes (response) as argument
+            
+        Example:
+            >>> def log_response(response):
+            ...     print(f"Response status: {response.status_code}")
+            >>> client.add_response_hook(log_response)
+        """
+        if not callable(hook):
+            raise TypeError("Hook must be callable")
+        self._response_hooks.append(hook)
+
+    def remove_request_hook(self, hook: Callable) -> None:
+        """
+        Remove a request hook (issue #35)
+        
+        Args:
+            hook: The hook to remove
+        """
+        if hook in self._request_hooks:
+            self._request_hooks.remove(hook)
+
+    def remove_response_hook(self, hook: Callable) -> None:
+        """
+        Remove a response hook (issue #35)
+        
+        Args:
+            hook: The hook to remove
+        """
+        if hook in self._response_hooks:
+            self._response_hooks.remove(hook)
+
+    def clear_request_hooks(self) -> None:
+        """Clear all request hooks (issue #35)"""
+        self._request_hooks.clear()
+
+    def clear_response_hooks(self) -> None:
+        """Clear all response hooks (issue #35)"""
+        self._response_hooks.clear()
+
     def _get(self, endpoint: str, params: Optional[Dict[str, Any]] = None, timeout: Optional[int] = None) -> Dict[str, Any]:
         """
         Make a GET request with optional retry logic (issue #11)
@@ -203,6 +271,14 @@ class BaseClient:
         # Log request (issue #26, #28)
         self._logger.debug(f"GET request [ID: {request_id}]: {url} with params: {sanitize_api_key_for_logging(str(params), self._api_key)}")
         
+        # Call request hooks (issue #35)
+        headers = {'X-Request-ID': request_id}
+        for hook in self._request_hooks:
+            try:
+                hook("GET", url, headers, params, None)
+            except Exception as e:
+                self._logger.warning(f"Request hook raised exception: {e}", exc_info=True)
+        
         # Retry logic (issue #11)
         last_exception = None
         last_request_id = request_id
@@ -215,12 +291,24 @@ class BaseClient:
                 request_id = str(uuid.uuid4())
                 last_request_id = request_id
                 self._logger.info(f"Retry attempt {attempt}/{max_retries} for GET {url} [ID: {request_id}]")
+                # Update headers with new request ID
+                headers = {'X-Request-ID': request_id}
+                # Call request hooks for retry (issue #35)
+                for hook in self._request_hooks:
+                    try:
+                        hook("GET", url, headers, params, None)
+                    except Exception as e:
+                        self._logger.warning(f"Request hook raised exception: {e}", exc_info=True)
             
             try:
-                # Add request ID to headers (issue #28)
-                headers = {'X-Request-ID': request_id}
-                
                 response = self.session.get(url, params=params, headers=headers, timeout=request_timeout)
+                
+                # Call response hooks (issue #35)
+                for hook in self._response_hooks:
+                    try:
+                        hook(response)
+                    except Exception as e:
+                        self._logger.warning(f"Response hook raised exception: {e}", exc_info=True)
                 
                 # Log response (issue #26, #28)
                 self._logger.debug(f"GET response [ID: {request_id}]: {url} - Status: {response.status_code}")
@@ -360,6 +448,15 @@ class BaseClient:
         # Log request (issue #26, #28)
         self._logger.debug(f"POST request [ID: {request_id}]: {url} with data keys: {list(data.keys()) if data else 'None'}")
         
+        # Call request hooks (issue #35)
+        headers_with_id = headers.copy() if headers else {}
+        headers_with_id['X-Request-ID'] = request_id
+        for hook in self._request_hooks:
+            try:
+                hook("POST", url, headers_with_id, params, data)
+            except Exception as e:
+                self._logger.warning(f"Request hook raised exception: {e}", exc_info=True)
+        
         # Retry logic (issue #11)
         last_exception = None
         last_request_id = request_id
@@ -372,15 +469,27 @@ class BaseClient:
                 request_id = str(uuid.uuid4())
                 last_request_id = request_id
                 self._logger.info(f"Retry attempt {attempt}/{max_retries} for POST {url} [ID: {request_id}]")
-            
-            try:
-                # Add request ID to headers (issue #28)
+                # Update headers with new request ID
                 headers_with_id = headers.copy() if headers else {}
                 headers_with_id['X-Request-ID'] = request_id
-                
+                # Call request hooks for retry (issue #35)
+                for hook in self._request_hooks:
+                    try:
+                        hook("POST", url, headers_with_id, params, data)
+                    except Exception as e:
+                        self._logger.warning(f"Request hook raised exception: {e}", exc_info=True)
+            
+            try:
                 response = self.session.post(
                     url, json=data, headers=headers_with_id, params=params, timeout=request_timeout
                 )
+                
+                # Call response hooks (issue #35)
+                for hook in self._response_hooks:
+                    try:
+                        hook(response)
+                    except Exception as e:
+                        self._logger.warning(f"Response hook raised exception: {e}", exc_info=True)
                 
                 # Log response (issue #26, #28)
                 self._logger.debug(f"POST response [ID: {request_id}]: {url} - Status: {response.status_code}")
