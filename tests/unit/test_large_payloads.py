@@ -43,7 +43,10 @@ class TestLargePayloads:
     def test_large_coordinate_arrays(self, mock_post, api_key, sample_origin, sample_destination):
         """Test large coordinate arrays in Routes API"""
         mock_response = {
-            "routes": [{"distanceMeters": 1000, "duration": "5m"}]
+            "routeMatrixElements": [
+                {"originIndex": i, "destinationIndex": j, "duration": "5m", "distanceMeters": 1000}
+                for i in range(50) for j in range(50)
+            ]
         }
         mock_post.return_value = MagicMock(
             status_code=200,
