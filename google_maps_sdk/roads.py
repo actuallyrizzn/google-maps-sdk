@@ -18,7 +18,7 @@ class RoadsClient(BaseClient):
 
     def __init__(
         self, 
-        api_key: str, 
+        api_key: Optional[str] = None, 
         timeout: int = 30,
         rate_limit_max_calls: Optional[int] = None,
         rate_limit_period: Optional[float] = None,
@@ -28,7 +28,7 @@ class RoadsClient(BaseClient):
         Initialize Roads API client
 
         Args:
-            api_key: Google Maps Platform API key
+            api_key: Google Maps Platform API key (optional, can use GOOGLE_MAPS_API_KEY env var) (issue #31)
             timeout: Request timeout in seconds
             rate_limit_max_calls: Maximum calls per period for rate limiting (None to disable)
             rate_limit_period: Time period in seconds for rate limiting (default: 60.0)

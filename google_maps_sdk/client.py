@@ -21,7 +21,7 @@ class GoogleMapsClient:
 
     def __init__(
         self, 
-        api_key: str, 
+        api_key: Optional[str] = None, 
         timeout: int = 30,
         rate_limit_max_calls: Optional[int] = None,
         rate_limit_period: Optional[float] = None,
@@ -31,7 +31,7 @@ class GoogleMapsClient:
         Initialize Google Maps Platform client
 
         Args:
-            api_key: Google Maps Platform API key
+            api_key: Google Maps Platform API key (optional, can use GOOGLE_MAPS_API_KEY env var) (issue #31)
             timeout: Request timeout in seconds for all API calls
             rate_limit_max_calls: Maximum calls per period for rate limiting (None to disable)
             rate_limit_period: Time period in seconds for rate limiting (default: 60.0)
@@ -39,8 +39,20 @@ class GoogleMapsClient:
 
         Example:
             >>> client = GoogleMapsClient(api_key="YOUR_API_KEY")
+            >>> # Or use environment variable:
+            >>> # export GOOGLE_MAPS_API_KEY=your_key
+            >>> client = GoogleMapsClient()
             >>> routes = client.routes.compute_routes(origin, destination)
         """
+        # Get API key from parameter or environment variable (issue #31)
+        if api_key is None:
+            import os
+            api_key = os.getenv("GOOGLE_MAPS_API_KEY")
+            if api_key is None:
+                raise ValueError(
+                    "API key is required. Provide as parameter or set GOOGLE_MAPS_API_KEY environment variable"
+                )
+        
         self.api_key = api_key
         self.timeout = timeout
 

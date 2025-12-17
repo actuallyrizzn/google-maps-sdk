@@ -8,6 +8,7 @@ import time
 import threading
 import logging
 import uuid
+import os
 from typing import Optional, Dict, Any
 from requests.adapters import HTTPAdapter
 from urllib3.util.retry import Retry
@@ -34,9 +35,9 @@ class BaseClient:
     """Base client for all Google Maps Platform API clients"""
 
     def __init__(
-        self, 
-        api_key: str, 
-        base_url: str, 
+        self,
+        api_key: Optional[str] = None,
+        base_url: str = "",
         timeout: int = 30,
         rate_limit_max_calls: Optional[int] = None,
         rate_limit_period: Optional[float] = None,
@@ -46,7 +47,7 @@ class BaseClient:
         Initialize base client
 
         Args:
-            api_key: Google Maps Platform API key
+            api_key: Google Maps Platform API key (optional, can use GOOGLE_MAPS_API_KEY env var) (issue #31)
             base_url: Base URL for the API
             timeout: Request timeout in seconds
             rate_limit_max_calls: Maximum calls per period for rate limiting (None to disable)
@@ -57,6 +58,14 @@ class BaseClient:
             TypeError: If api_key is not a string
             ValueError: If api_key or base_url is invalid
         """
+        # Get API key from parameter or environment variable (issue #31)
+        if api_key is None:
+            api_key = os.getenv("GOOGLE_MAPS_API_KEY")
+            if api_key is None:
+                raise ValueError(
+                    "API key is required. Provide as parameter or set GOOGLE_MAPS_API_KEY environment variable"
+                )
+        
         # Validate and store API key (issue #2, #6)
         self._api_key = validate_api_key(api_key)
         
