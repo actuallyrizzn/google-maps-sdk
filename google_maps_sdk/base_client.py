@@ -56,6 +56,7 @@ class BaseClient:
         compression_threshold: int = 1024,
         json_encoder: Optional[type] = None,
         exception_handler: Optional[Callable[[Exception, Dict[str, Any]], Optional[Exception]]] = None,
+        response_validator: Optional[Callable[[Dict[str, Any], Dict[str, Any]], Optional[Dict[str, Any]]]] = None,
         config: Optional[ClientConfig] = None,
     ):
         """
@@ -101,6 +102,7 @@ class BaseClient:
             compression_threshold = config.compression_threshold
             json_encoder = config.json_encoder
             exception_handler = config.exception_handler
+            response_validator = config.response_validator
         
         # Get API key from parameter or environment variable (issue #31)
         if api_key is None:
@@ -178,6 +180,9 @@ class BaseClient:
         
         # Custom exception handler (issue #98)
         self._exception_handler = exception_handler
+        
+        # Custom response validator (issue #99)
+        self._response_validator = response_validator
 
     @property
     def api_key(self) -> str:
@@ -952,6 +957,46 @@ class BaseClient:
                 error = self._apply_exception_handler(error, request_info)
                 raise error
 
+    def _validate_response(self, data: Dict[str, Any], request_info: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
+        """
+        Validate response data using custom validator if configured (issue #99)
+        
+        Args:
+            data: The response data to validate
+            request_info: Optional dictionary with request context (url, method, request_id, etc.)
+            
+        Returns:
+            The validated data (may be modified by validator or original)
+            
+        Raises:
+            ValueError: If validator raises ValueError
+            GoogleMapsAPIError: If validator raises GoogleMapsAPIError
+        """
+        if self._response_validator is None:
+            return data
+        
+        try:
+            request_info = request_info or {}
+            result = self._response_validator(data, request_info)
+            # If validator returns None, use original data
+            if result is None:
+                return data
+            # If validator returns data, use it
+            if isinstance(result, dict):
+                return result
+            # If validator returns something else, use original
+            return data
+        except (ValueError, GoogleMapsAPIError):
+            # Re-raise validation errors
+            raise
+        except Exception as validator_error:
+            # If validator raises unexpected error, log and raise as GoogleMapsAPIError
+            self._logger.warning(
+                f"Response validator raised unexpected error: {validator_error}. Raising as GoogleMapsAPIError.",
+                exc_info=True
+            )
+            raise GoogleMapsAPIError(f"Response validation failed: {validator_error}") from validator_error
+    
     def _handle_response(self, response: requests.Response, request_id: Optional[str] = None) -> Dict[str, Any]:
         """
         Handle HTTP response and convert to appropriate format (issue #28, #78)
@@ -974,6 +1019,14 @@ class BaseClient:
         
         # Check for Directions API errors (issue #78)
         self._check_directions_api_errors(data, response, request_id=request_id)
+        
+        # Validate response data (issue #99)
+        request_info = {
+            'url': str(response.url) if hasattr(response, 'url') else None,
+            'status_code': response.status_code,
+            'request_id': request_id,
+        }
+        data = self._validate_response(data, request_info)
 
         return data
 

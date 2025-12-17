@@ -36,6 +36,9 @@ class ClientConfig:
         json_encoder: Custom JSON encoder class for encoding request data (None to use default)
         exception_handler: Optional callable to customize exception handling (issue #98). 
             Receives (exception, request_info) and can return modified exception or None to use original.
+        response_validator: Optional callable to validate response data (issue #99).
+            Receives (data, request_info) and can return validated data or None to use original.
+            Can raise ValueError or GoogleMapsAPIError if validation fails.
     """
     api_key: Optional[str] = None
     base_url: str = ""
@@ -54,6 +57,7 @@ class ClientConfig:
     compression_threshold: int = 1024
     json_encoder: Optional[Type] = None
     exception_handler: Optional[Callable[[Exception, Dict[str, Any]], Optional[Exception]]] = None
+    response_validator: Optional[Callable[[Dict[str, Any], Dict[str, Any]], Optional[Dict[str, Any]]]] = None
     
     def to_dict(self) -> dict:
         """
@@ -80,6 +84,7 @@ class ClientConfig:
             'compression_threshold': self.compression_threshold,
             'json_encoder': self.json_encoder,
             'exception_handler': self.exception_handler,
+            'response_validator': self.response_validator,
         }
     
     @classmethod
@@ -120,4 +125,5 @@ class ClientConfig:
             compression_threshold=self.compression_threshold,
             json_encoder=self.json_encoder,
             exception_handler=self.exception_handler,
+            response_validator=self.response_validator,
         )
