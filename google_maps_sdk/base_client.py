@@ -8,6 +8,8 @@ import time
 import threading
 import logging
 from typing import Optional, Dict, Any
+from requests.adapters import HTTPAdapter
+from urllib3.util.retry import Retry
 from .exceptions import (
     handle_http_error,
     GoogleMapsAPIError,
@@ -85,7 +87,11 @@ class BaseClient:
             'headers': {
                 'User-Agent': f'google-maps-sdk/{__import__("google_maps_sdk").__version__}',
                 'Accept-Encoding': 'gzip, deflate, br'
-            }
+            },
+            # Connection pooling configuration (issue #27)
+            'pool_connections': 10,  # Number of connection pools to cache
+            'pool_maxsize': 20,  # Maximum number of connections to save in the pool
+            'max_retries': 0,  # We handle retries ourselves (issue #11)
         }
         
         # Initialize logger (issue #26)
@@ -116,7 +122,7 @@ class BaseClient:
         Get thread-local session (issue #19)
         
         Each thread gets its own session instance to ensure thread safety.
-        Sessions are created lazily on first access.
+        Sessions are created lazily on first access with connection pooling configured (issue #27).
         
         Returns:
             Thread-local requests.Session instance
@@ -126,6 +132,15 @@ class BaseClient:
             self._local.session = requests.Session()
             self._local.session.verify = self._session_config['verify']
             self._local.session.headers.update(self._session_config['headers'])
+            
+            # Configure connection pooling (issue #27)
+            adapter = HTTPAdapter(
+                pool_connections=self._session_config['pool_connections'],
+                pool_maxsize=self._session_config['pool_maxsize'],
+                max_retries=Retry(total=self._session_config['max_retries'])  # We handle retries ourselves
+            )
+            self._local.session.mount('https://', adapter)
+            self._local.session.mount('http://', adapter)
         return self._local.session
 
     def set_api_key(self, api_key: str) -> None:
