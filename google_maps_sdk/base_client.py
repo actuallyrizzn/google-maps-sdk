@@ -53,6 +53,7 @@ class BaseClient:
         circuit_breaker: Optional[CircuitBreaker] = None,
         enable_request_compression: bool = False,
         compression_threshold: int = 1024,
+        json_encoder: Optional[type] = None,
     ):
         """
         Initialize base client
@@ -64,6 +65,14 @@ class BaseClient:
             rate_limit_max_calls: Maximum calls per period for rate limiting (None to disable)
             rate_limit_period: Time period in seconds for rate limiting (default: 60.0)
             retry_config: Retry configuration (None to disable retries) (issue #11)
+            enable_cache: Enable response caching (default: False) (issue #37)
+            cache_ttl: Cache time-to-live in seconds (default: 300.0 = 5 minutes) (issue #37)
+            cache_maxsize: Maximum number of cached responses (default: 100) (issue #37)
+            http_adapter: Custom HTTPAdapter for proxies, custom SSL, etc. (None to use default) (issue #38)
+            circuit_breaker: CircuitBreaker instance for failure protection (None to disable) (issue #39)
+            enable_request_compression: Enable gzip compression for large POST requests (default: False) (issue #49)
+            compression_threshold: Minimum payload size in bytes to compress (default: 1024) (issue #49)
+            json_encoder: Custom JSON encoder class for encoding request data (None to use default) (issue #51)
 
         Raises:
             TypeError: If api_key is not a string
@@ -139,6 +148,9 @@ class BaseClient:
         # Request compression configuration (issue #49)
         self._enable_request_compression = enable_request_compression
         self._compression_threshold = compression_threshold
+        
+        # Custom JSON encoder (issue #51)
+        self._json_encoder = json_encoder
 
     @property
     def api_key(self) -> str:
@@ -556,7 +568,11 @@ class BaseClient:
                     use_json_param = True
                     
                     if self._enable_request_compression and data:
-                        data_json = json.dumps(data)
+                        # Use custom JSON encoder if provided (issue #51)
+                        if self._json_encoder:
+                            data_json = json.dumps(data, cls=self._json_encoder)
+                        else:
+                            data_json = json.dumps(data)
                         data_bytes = data_json.encode('utf-8')
                         
                         if len(data_bytes) >= self._compression_threshold:
@@ -569,9 +585,18 @@ class BaseClient:
                             self._logger.debug(f"Compressed request body: {len(data_bytes)} -> {len(compressed_data)} bytes [ID: {request_id}]")
                     
                     if use_json_param:
-                        response = self.session.post(
-                            url, json=post_data, headers=post_headers, params=params, timeout=request_timeout
-                        )
+                        # Use custom JSON encoder if provided (issue #51)
+                        if self._json_encoder:
+                            # When using custom encoder, we need to manually encode
+                            data_json = json.dumps(post_data, cls=self._json_encoder)
+                            post_headers['Content-Type'] = 'application/json'
+                            response = self.session.post(
+                                url, data=data_json.encode('utf-8'), headers=post_headers, params=params, timeout=request_timeout
+                            )
+                        else:
+                            response = self.session.post(
+                                url, json=post_data, headers=post_headers, params=params, timeout=request_timeout
+                            )
                     else:
                         response = self.session.post(
                             url, data=post_data, headers=post_headers, params=params, timeout=request_timeout

@@ -48,6 +48,7 @@ class RoutesClient(BaseClient):
         circuit_breaker: Optional['CircuitBreaker'] = None,
         enable_request_compression: bool = False,
         compression_threshold: int = 1024,
+        json_encoder: Optional[type] = None,
     ):
         """
         Initialize Routes API client
@@ -65,6 +66,7 @@ class RoutesClient(BaseClient):
             circuit_breaker: CircuitBreaker instance for failure protection (None to disable) (issue #39)
             enable_request_compression: Enable gzip compression for large POST requests (default: False) (issue #49)
             compression_threshold: Minimum payload size in bytes to compress (default: 1024) (issue #49)
+            json_encoder: Custom JSON encoder class for encoding request data (None to use default) (issue #51)
         """
         super().__init__(
             api_key, 
@@ -80,6 +82,7 @@ class RoutesClient(BaseClient):
             circuit_breaker=circuit_breaker,
             enable_request_compression=enable_request_compression,
             compression_threshold=compression_threshold,
+            json_encoder=json_encoder,
         )
 
     def _post(
@@ -187,7 +190,11 @@ class RoutesClient(BaseClient):
                     if self._enable_request_compression and data:
                         import json
                         import gzip
-                        data_json = json.dumps(data)
+                        # Use custom JSON encoder if provided (issue #51)
+                        if self._json_encoder:
+                            data_json = json.dumps(data, cls=self._json_encoder)
+                        else:
+                            data_json = json.dumps(data)
                         data_bytes = data_json.encode('utf-8')
                         
                         if len(data_bytes) >= self._compression_threshold:
@@ -200,9 +207,18 @@ class RoutesClient(BaseClient):
                             self._logger.debug(f"Compressed request body: {len(data_bytes)} -> {len(compressed_data)} bytes [ID: {request_id}]")
                     
                     if use_json_param:
-                        response = self.session.post(
-                            url, json=post_data, headers=post_headers, params=params, timeout=request_timeout
-                        )
+                        # Use custom JSON encoder if provided (issue #51)
+                        if self._json_encoder:
+                            # When using custom encoder, we need to manually encode
+                            data_json = json.dumps(post_data, cls=self._json_encoder)
+                            post_headers['Content-Type'] = 'application/json'
+                            response = self.session.post(
+                                url, data=data_json.encode('utf-8'), headers=post_headers, params=params, timeout=request_timeout
+                            )
+                        else:
+                            response = self.session.post(
+                                url, json=post_data, headers=post_headers, params=params, timeout=request_timeout
+                            )
                     else:
                         response = self.session.post(
                             url, data=post_data, headers=post_headers, params=params, timeout=request_timeout

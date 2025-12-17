@@ -37,6 +37,7 @@ class GoogleMapsClient:
         circuit_breaker: Optional['CircuitBreaker'] = None,
         enable_request_compression: bool = False,
         compression_threshold: int = 1024,
+        json_encoder: Optional[type] = None,
     ):
         """
         Initialize Google Maps Platform client
@@ -54,6 +55,7 @@ class GoogleMapsClient:
             circuit_breaker: CircuitBreaker instance for failure protection (None to disable) (issue #39)
             enable_request_compression: Enable gzip compression for large POST requests (default: False) (issue #49)
             compression_threshold: Minimum payload size in bytes to compress (default: 1024) (issue #49)
+            json_encoder: Custom JSON encoder class for encoding request data (None to use default) (issue #51)
 
         Example:
             >>> client = GoogleMapsClient(api_key="YOUR_API_KEY")
@@ -74,7 +76,7 @@ class GoogleMapsClient:
         self.api_key = api_key
         self.timeout = timeout
 
-        # Initialize sub-clients with rate limiting, retry, cache, custom adapter, circuit breaker, and compression
+        # Initialize sub-clients with rate limiting, retry, cache, custom adapter, circuit breaker, compression, and JSON encoder
         self.routes = RoutesClient(
             api_key, 
             timeout,
@@ -88,6 +90,7 @@ class GoogleMapsClient:
             circuit_breaker=circuit_breaker,
             enable_request_compression=enable_request_compression,
             compression_threshold=compression_threshold,
+            json_encoder=json_encoder,
         )
         self.directions = DirectionsClient(
             api_key, 
@@ -102,6 +105,7 @@ class GoogleMapsClient:
             circuit_breaker=circuit_breaker,
             enable_request_compression=enable_request_compression,
             compression_threshold=compression_threshold,
+            json_encoder=json_encoder,
         )
         self.roads = RoadsClient(
             api_key, 
@@ -116,6 +120,7 @@ class GoogleMapsClient:
             circuit_breaker=circuit_breaker,
             enable_request_compression=enable_request_compression,
             compression_threshold=compression_threshold,
+            json_encoder=json_encoder,
         )
 
     def set_api_key(self, api_key: str) -> None:
