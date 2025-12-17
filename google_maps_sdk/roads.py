@@ -12,6 +12,7 @@ from .utils import validate_path_or_points, MAX_ROADS_POINTS
 
 if TYPE_CHECKING:
     from requests.adapters import HTTPAdapter
+    from .circuit_breaker import CircuitBreaker
 
 
 class RoadsClient(BaseClient):

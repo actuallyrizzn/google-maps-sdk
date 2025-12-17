@@ -11,6 +11,7 @@ from .types import DirectionsResponse
 
 if TYPE_CHECKING:
     from requests.adapters import HTTPAdapter
+    from .circuit_breaker import CircuitBreaker
 from .utils import (
     validate_waypoint_count,
     validate_language_code,

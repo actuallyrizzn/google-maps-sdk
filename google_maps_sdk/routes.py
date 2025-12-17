@@ -4,11 +4,16 @@ Routes API Client
 Modern routing API with traffic-aware routing capabilities.
 """
 
-from typing import Optional, Dict, Any, List, Union
+from typing import Optional, Dict, Any, List, Union, TYPE_CHECKING
 import requests
 from .base_client import BaseClient
 from .retry import RetryConfig
 from .types import RouteResponse, RouteMatrixResponse
+
+if TYPE_CHECKING:
+    from requests.adapters import HTTPAdapter
+    from .circuit_breaker import CircuitBreaker
+
 from .utils import (
     validate_waypoint_count,
     validate_route_matrix_size,
@@ -40,6 +45,7 @@ class RoutesClient(BaseClient):
         cache_ttl: float = 300.0,
         cache_maxsize: int = 100,
         http_adapter: Optional['HTTPAdapter'] = None,
+        circuit_breaker: Optional['CircuitBreaker'] = None,
     ):
         """
         Initialize Routes API client
@@ -54,6 +60,7 @@ class RoutesClient(BaseClient):
             cache_ttl: Cache time-to-live in seconds (default: 300.0 = 5 minutes) (issue #37)
             cache_maxsize: Maximum number of cached responses (default: 100) (issue #37)
             http_adapter: Custom HTTPAdapter for proxies, custom SSL, etc. (None to use default) (issue #38)
+            circuit_breaker: CircuitBreaker instance for failure protection (None to disable) (issue #39)
         """
         super().__init__(
             api_key, 
@@ -66,6 +73,7 @@ class RoutesClient(BaseClient):
             cache_ttl=cache_ttl,
             cache_maxsize=cache_maxsize,
             http_adapter=http_adapter,
+            circuit_breaker=circuit_breaker,
         )
 
     def _post(
@@ -123,141 +131,150 @@ class RoutesClient(BaseClient):
                 self._logger.debug(f"Cache hit [ID: {request_id}]: {url}")
                 return cached_response
         
-        # Log request (issue #26, #28)
-        self._logger.debug(f"POST request [ID: {request_id}]: {url} with data keys: {list(data.keys()) if data else 'None'}")
-        
-        # Call request hooks (issue #35)
-        headers_with_id = headers.copy() if headers else {}
-        headers_with_id['X-Request-ID'] = request_id
-        for hook in self._request_hooks:
-            try:
-                hook("POST", url, headers_with_id, params, data)
-            except Exception as e:
-                self._logger.warning(f"Request hook raised exception: {e}", exc_info=True)
-        
-        # Retry logic (issue #11) - RoutesClient has its own _post, so we need retry here too
-        from .retry import should_retry, exponential_backoff
-        import time
-        from .exceptions import GoogleMapsAPIError
-        from .utils import sanitize_api_key_for_logging
-        
-        last_exception = None
-        last_request_id = request_id
-        max_retries = self._retry_config.max_retries if self._retry_config else 0
-        
-        for attempt in range(max_retries + 1):
-            # Generate new request ID for retries
-            if attempt > 0:
-                request_id = str(uuid.uuid4())
-                last_request_id = request_id
-                self._logger.info(f"Retry attempt {attempt}/{max_retries} for POST {url} [ID: {request_id}]")
-                # Update headers with new request ID
-                headers_with_id = headers.copy() if headers else {}
-                headers_with_id['X-Request-ID'] = request_id
-                # Call request hooks for retry (issue #35)
-                for hook in self._request_hooks:
-                    try:
-                        hook("POST", url, headers_with_id, params, data)
-                    except Exception as e:
-                        self._logger.warning(f"Request hook raised exception: {e}", exc_info=True)
+        # Define the actual request function for circuit breaker (issue #39)
+        def _make_request():
+            nonlocal request_id
+            # Log request (issue #26, #28)
+            self._logger.debug(f"POST request [ID: {request_id}]: {url} with data keys: {list(data.keys()) if data else 'None'}")
             
-            try:
-                response = self.session.post(
-                    url, json=data, headers=headers_with_id, params=params, timeout=request_timeout
-                )
+            # Call request hooks (issue #35)
+            headers_with_id = headers.copy() if headers else {}
+            headers_with_id['X-Request-ID'] = request_id
+            for hook in self._request_hooks:
+                try:
+                    hook("POST", url, headers_with_id, params, data)
+                except Exception as e:
+                    self._logger.warning(f"Request hook raised exception: {e}", exc_info=True)
+            
+            # Retry logic (issue #11) - RoutesClient has its own _post, so we need retry here too
+            from .retry import should_retry, exponential_backoff
+            import time
+            from .exceptions import GoogleMapsAPIError
+            from .utils import sanitize_api_key_for_logging
+            
+            last_exception = None
+            last_request_id = request_id
+            max_retries = self._retry_config.max_retries if self._retry_config else 0
+            
+            for attempt in range(max_retries + 1):
+                # Generate new request ID for retries
+                if attempt > 0:
+                    request_id = str(uuid.uuid4())
+                    last_request_id = request_id
+                    self._logger.info(f"Retry attempt {attempt}/{max_retries} for POST {url} [ID: {request_id}]")
+                    # Update headers with new request ID
+                    headers_with_id = headers.copy() if headers else {}
+                    headers_with_id['X-Request-ID'] = request_id
+                    # Call request hooks for retry (issue #35)
+                    for hook in self._request_hooks:
+                        try:
+                            hook("POST", url, headers_with_id, params, data)
+                        except Exception as e:
+                            self._logger.warning(f"Request hook raised exception: {e}", exc_info=True)
                 
-                # Call response hooks (issue #35)
-                for hook in self._response_hooks:
-                    try:
-                        hook(response)
-                    except Exception as e:
-                        self._logger.warning(f"Response hook raised exception: {e}", exc_info=True)
-                
-                # Log response (issue #26, #28)
-                self._logger.debug(f"POST response [ID: {request_id}]: {url} - Status: {response.status_code}")
-                
-                result = self._handle_response(response, request_id=request_id)
-                
-                # Cache successful response (issue #37)
-                if self._cache is not None and attempt == 0:  # Only cache on first successful attempt
-                    from .cache import generate_cache_key
-                    cache_key = generate_cache_key("POST", url, params, data)
-                    self._cache[cache_key] = result
-                    self._logger.debug(f"Cached response [ID: {request_id}]: {url}")
-                
-                return result
-            except (requests.exceptions.Timeout, requests.exceptions.ConnectionError) as e:
-                last_exception = e
-                
-                # Log error with request ID (issue #26, #28)
-                self._logger.warning(f"POST request failed [ID: {request_id}] (attempt {attempt + 1}/{max_retries + 1}): {type(e).__name__}: {sanitize_api_key_for_logging(str(e), self._api_key)}")
-                
-                if self._retry_config and should_retry(e, None):
-                    if attempt >= max_retries:
-                        break
-                    
-                    delay = exponential_backoff(
-                        attempt,
-                        base_delay=self._retry_config.base_delay,
-                        max_delay=self._retry_config.max_delay,
-                        exponential_base=self._retry_config.exponential_base,
-                        jitter=self._retry_config.jitter
+                try:
+                    response = self.session.post(
+                        url, json=data, headers=headers_with_id, params=params, timeout=request_timeout
                     )
-                    self._logger.debug(f"Waiting {delay:.2f}s before retry [ID: {request_id}]")
-                    time.sleep(delay)
-                    continue
-                else:
-                    break
-            except GoogleMapsAPIError as e:
-                last_exception = e
-                
-                # Store request ID in exception (issue #28)
-                if not hasattr(e, 'request_id'):
-                    e.request_id = request_id
-                
-                # Log error with request ID (issue #26, #28)
-                self._logger.warning(f"POST request failed [ID: {request_id}] (attempt {attempt + 1}/{max_retries + 1}): {type(e).__name__}: {sanitize_api_key_for_logging(str(e), self._api_key)}")
-                
-                if self._retry_config and should_retry(e, e.status_code):
-                    if attempt >= max_retries:
-                        break
                     
-                    delay = exponential_backoff(
-                        attempt,
-                        base_delay=self._retry_config.base_delay,
-                        max_delay=self._retry_config.max_delay,
-                        exponential_base=self._retry_config.exponential_base,
-                        jitter=self._retry_config.jitter
-                    )
-                    self._logger.debug(f"Waiting {delay:.2f}s before retry [ID: {request_id}]")
-                    time.sleep(delay)
-                    continue
-                else:
-                    raise
-            except requests.exceptions.RequestException as e:
-                error_msg = sanitize_api_key_for_logging(str(e), self._api_key)
-                self._logger.error(f"POST request failed [ID: {request_id}]: {error_msg}", exc_info=True)
-                error = GoogleMapsAPIError(f"Request failed: {error_msg}", request_url=url)
-                error.request_id = request_id
-                raise error from e
-        
-        if last_exception:
-            error_msg = sanitize_api_key_for_logging(str(last_exception), self._api_key)
-            self._logger.error(f"POST request failed after {max_retries + 1} attempts [ID: {last_request_id}]: {error_msg}", exc_info=True)
-            if isinstance(last_exception, (requests.exceptions.Timeout, requests.exceptions.ConnectionError)):
+                    # Call response hooks (issue #35)
+                    for hook in self._response_hooks:
+                        try:
+                            hook(response)
+                        except Exception as e:
+                            self._logger.warning(f"Response hook raised exception: {e}", exc_info=True)
+                    
+                    # Log response (issue #26, #28)
+                    self._logger.debug(f"POST response [ID: {request_id}]: {url} - Status: {response.status_code}")
+                    
+                    result = self._handle_response(response, request_id=request_id)
+                    
+                    # Cache successful response (issue #37)
+                    if self._cache is not None and attempt == 0:  # Only cache on first successful attempt
+                        from .cache import generate_cache_key
+                        cache_key = generate_cache_key("POST", url, params, data)
+                        self._cache[cache_key] = result
+                        self._logger.debug(f"Cached response [ID: {request_id}]: {url}")
+                    
+                    return result
+                except (requests.exceptions.Timeout, requests.exceptions.ConnectionError) as e:
+                    last_exception = e
+                    
+                    # Log error with request ID (issue #26, #28)
+                    self._logger.warning(f"POST request failed [ID: {request_id}] (attempt {attempt + 1}/{max_retries + 1}): {type(e).__name__}: {sanitize_api_key_for_logging(str(e), self._api_key)}")
+                    
+                    if self._retry_config and should_retry(e, None):
+                        if attempt >= max_retries:
+                            break
+                        
+                        delay = exponential_backoff(
+                            attempt,
+                            base_delay=self._retry_config.base_delay,
+                            max_delay=self._retry_config.max_delay,
+                            exponential_base=self._retry_config.exponential_base,
+                            jitter=self._retry_config.jitter
+                        )
+                        self._logger.debug(f"Waiting {delay:.2f}s before retry [ID: {request_id}]")
+                        time.sleep(delay)
+                        continue
+                    else:
+                        break
+                except GoogleMapsAPIError as e:
+                    last_exception = e
+                    
+                    # Store request ID in exception (issue #28)
+                    if not hasattr(e, 'request_id'):
+                        e.request_id = request_id
+                    
+                    # Log error with request ID (issue #26, #28)
+                    self._logger.warning(f"POST request failed [ID: {request_id}] (attempt {attempt + 1}/{max_retries + 1}): {type(e).__name__}: {sanitize_api_key_for_logging(str(e), self._api_key)}")
+                    
+                    if self._retry_config and should_retry(e, e.status_code):
+                        if attempt >= max_retries:
+                            break
+                        
+                        delay = exponential_backoff(
+                            attempt,
+                            base_delay=self._retry_config.base_delay,
+                            max_delay=self._retry_config.max_delay,
+                            exponential_base=self._retry_config.exponential_base,
+                            jitter=self._retry_config.jitter
+                        )
+                        self._logger.debug(f"Waiting {delay:.2f}s before retry [ID: {request_id}]")
+                        time.sleep(delay)
+                        continue
+                    else:
+                        raise
+                except requests.exceptions.RequestException as e:
+                    error_msg = sanitize_api_key_for_logging(str(e), self._api_key)
+                    self._logger.error(f"POST request failed [ID: {request_id}]: {error_msg}", exc_info=True)
+                    error = GoogleMapsAPIError(f"Request failed: {error_msg}", request_url=url)
+                    error.request_id = request_id
+                    raise error from e
+            
+            if last_exception:
                 error_msg = sanitize_api_key_for_logging(str(last_exception), self._api_key)
-                error = GoogleMapsAPIError(f"Request failed after {max_retries + 1} attempts: {error_msg}", request_url=url)
-                error.request_id = last_request_id
-                raise error from last_exception
-            else:
-                if isinstance(last_exception, GoogleMapsAPIError) and not hasattr(last_exception, 'request_id'):
-                    last_exception.request_id = last_request_id
-                raise last_exception
+                self._logger.error(f"POST request failed after {max_retries + 1} attempts [ID: {last_request_id}]: {error_msg}", exc_info=True)
+                if isinstance(last_exception, (requests.exceptions.Timeout, requests.exceptions.ConnectionError)):
+                    error_msg = sanitize_api_key_for_logging(str(last_exception), self._api_key)
+                    error = GoogleMapsAPIError(f"Request failed after {max_retries + 1} attempts: {error_msg}", request_url=url)
+                    error.request_id = last_request_id
+                    raise error from last_exception
+                else:
+                    if isinstance(last_exception, GoogleMapsAPIError) and not hasattr(last_exception, 'request_id'):
+                        last_exception.request_id = last_request_id
+                    raise last_exception
+            
+            self._logger.error(f"POST request failed: Unknown error [ID: {request_id}]")
+            error = GoogleMapsAPIError("Request failed: Unknown error", request_url=url)
+            error.request_id = request_id
+            raise error
         
-        self._logger.error(f"POST request failed: Unknown error [ID: {request_id}]")
-        error = GoogleMapsAPIError("Request failed: Unknown error", request_url=url)
-        error.request_id = request_id
-        raise error
+        # Execute request with circuit breaker protection (issue #39)
+        if self._circuit_breaker is not None:
+            return self._circuit_breaker.call(_make_request)
+        else:
+            return _make_request()
 
     def compute_routes(
         self,

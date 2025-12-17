@@ -30,6 +30,7 @@ from .utils import (
 from .rate_limiter import RateLimiter
 from .retry import RetryConfig, should_retry, exponential_backoff
 from .cache import TTLCache, generate_cache_key
+from .circuit_breaker import CircuitBreaker, CircuitBreakerOpenError
 
 
 class BaseClient:
@@ -47,6 +48,7 @@ class BaseClient:
         cache_ttl: float = 300.0,
         cache_maxsize: int = 100,
         http_adapter: Optional[HTTPAdapter] = None,
+        circuit_breaker: Optional[CircuitBreaker] = None,
     ):
         """
         Initialize base client
@@ -126,6 +128,9 @@ class BaseClient:
             self._logger.debug(f"Cache enabled: maxsize={cache_maxsize}, ttl={cache_ttl}s")
         else:
             self._cache = None
+        
+        # Initialize circuit breaker (issue #39)
+        self._circuit_breaker = circuit_breaker
 
     @property
     def api_key(self) -> str:
@@ -297,145 +302,154 @@ class BaseClient:
                 self._logger.debug(f"Cache hit [ID: {request_id}]: {url}")
                 return cached_response
         
-        # Log request (issue #26, #28)
-        self._logger.debug(f"GET request [ID: {request_id}]: {url} with params: {sanitize_api_key_for_logging(str(params), self._api_key)}")
-        
-        # Call request hooks (issue #35)
-        headers = {'X-Request-ID': request_id}
-        for hook in self._request_hooks:
-            try:
-                hook("GET", url, headers, params, None)
-            except Exception as e:
-                self._logger.warning(f"Request hook raised exception: {e}", exc_info=True)
-        
-        # Retry logic (issue #11)
-        last_exception = None
-        last_request_id = request_id
-        
-        max_retries = self._retry_config.max_retries if self._retry_config else 0
-        
-        for attempt in range(max_retries + 1):
-            # Generate new request ID for retries
-            if attempt > 0:
-                request_id = str(uuid.uuid4())
-                last_request_id = request_id
-                self._logger.info(f"Retry attempt {attempt}/{max_retries} for GET {url} [ID: {request_id}]")
-                # Update headers with new request ID
-                headers = {'X-Request-ID': request_id}
-                # Call request hooks for retry (issue #35)
-                for hook in self._request_hooks:
-                    try:
-                        hook("GET", url, headers, params, None)
-                    except Exception as e:
-                        self._logger.warning(f"Request hook raised exception: {e}", exc_info=True)
+        # Define the actual request function for circuit breaker (issue #39)
+        def _make_request():
+            nonlocal request_id
+            # Log request (issue #26, #28)
+            self._logger.debug(f"GET request [ID: {request_id}]: {url} with params: {sanitize_api_key_for_logging(str(params), self._api_key)}")
             
-            try:
-                response = self.session.get(url, params=params, headers=headers, timeout=request_timeout)
+            # Call request hooks (issue #35)
+            headers = {'X-Request-ID': request_id}
+            for hook in self._request_hooks:
+                try:
+                    hook("GET", url, headers, params, None)
+                except Exception as e:
+                    self._logger.warning(f"Request hook raised exception: {e}", exc_info=True)
+            
+            # Retry logic (issue #11)
+            last_exception = None
+            last_request_id = request_id
+            
+            max_retries = self._retry_config.max_retries if self._retry_config else 0
+            
+            for attempt in range(max_retries + 1):
+                # Generate new request ID for retries
+                if attempt > 0:
+                    request_id = str(uuid.uuid4())
+                    last_request_id = request_id
+                    self._logger.info(f"Retry attempt {attempt}/{max_retries} for GET {url} [ID: {request_id}]")
+                    # Update headers with new request ID
+                    headers = {'X-Request-ID': request_id}
+                    # Call request hooks for retry (issue #35)
+                    for hook in self._request_hooks:
+                        try:
+                            hook("GET", url, headers, params, None)
+                        except Exception as e:
+                            self._logger.warning(f"Request hook raised exception: {e}", exc_info=True)
                 
-                # Call response hooks (issue #35)
-                for hook in self._response_hooks:
-                    try:
-                        hook(response)
-                    except Exception as e:
-                        self._logger.warning(f"Response hook raised exception: {e}", exc_info=True)
-                
-                # Log response (issue #26, #28)
-                self._logger.debug(f"GET response [ID: {request_id}]: {url} - Status: {response.status_code}")
-                
-                # _handle_response may raise GoogleMapsAPIError for HTTP errors
-                result = self._handle_response(response, request_id=request_id)
-                
-                # Cache successful response (issue #37)
-                if self._cache is not None and attempt == 0:  # Only cache on first successful attempt
-                    cache_key = generate_cache_key("GET", url, params, None)
-                    self._cache[cache_key] = result
-                    self._logger.debug(f"Cached response [ID: {request_id}]: {url}")
-                
-                return result
-            except (requests.exceptions.Timeout, requests.exceptions.ConnectionError) as e:
-                last_exception = e
-                
-                # Log error with request ID (issue #26, #28)
-                self._logger.warning(f"GET request failed [ID: {request_id}] (attempt {attempt + 1}/{max_retries + 1}): {type(e).__name__}: {sanitize_api_key_for_logging(str(e), self._api_key)}")
-                
-                # Check if we should retry
-                if self._retry_config and should_retry(e, None):
-                    # Don't retry on last attempt
-                    if attempt >= max_retries:
+                try:
+                    response = self.session.get(url, params=params, headers=headers, timeout=request_timeout)
+                    
+                    # Call response hooks (issue #35)
+                    for hook in self._response_hooks:
+                        try:
+                            hook(response)
+                        except Exception as e:
+                            self._logger.warning(f"Response hook raised exception: {e}", exc_info=True)
+                    
+                    # Log response (issue #26, #28)
+                    self._logger.debug(f"GET response [ID: {request_id}]: {url} - Status: {response.status_code}")
+                    
+                    # _handle_response may raise GoogleMapsAPIError for HTTP errors
+                    result = self._handle_response(response, request_id=request_id)
+                    
+                    # Cache successful response (issue #37)
+                    if self._cache is not None and attempt == 0:  # Only cache on first successful attempt
+                        cache_key = generate_cache_key("GET", url, params, None)
+                        self._cache[cache_key] = result
+                        self._logger.debug(f"Cached response [ID: {request_id}]: {url}")
+                    
+                    return result
+                except (requests.exceptions.Timeout, requests.exceptions.ConnectionError) as e:
+                    last_exception = e
+                    
+                    # Log error with request ID (issue #26, #28)
+                    self._logger.warning(f"GET request failed [ID: {request_id}] (attempt {attempt + 1}/{max_retries + 1}): {type(e).__name__}: {sanitize_api_key_for_logging(str(e), self._api_key)}")
+                    
+                    # Check if we should retry
+                    if self._retry_config and should_retry(e, None):
+                        # Don't retry on last attempt
+                        if attempt >= max_retries:
+                            break
+                        
+                        # Calculate backoff delay
+                        delay = exponential_backoff(
+                            attempt,
+                            base_delay=self._retry_config.base_delay,
+                            max_delay=self._retry_config.max_delay,
+                            exponential_base=self._retry_config.exponential_base,
+                            jitter=self._retry_config.jitter
+                        )
+                        
+                        self._logger.debug(f"Waiting {delay:.2f}s before retry [ID: {request_id}]")
+                        # Wait before retrying
+                        time.sleep(delay)
+                        continue
+                    else:
+                        # Non-retryable exception - raise immediately
                         break
+                except GoogleMapsAPIError as e:
+                    last_exception = e
                     
-                    # Calculate backoff delay
-                    delay = exponential_backoff(
-                        attempt,
-                        base_delay=self._retry_config.base_delay,
-                        max_delay=self._retry_config.max_delay,
-                        exponential_base=self._retry_config.exponential_base,
-                        jitter=self._retry_config.jitter
-                    )
+                    # Store request ID in exception (issue #28)
+                    if not hasattr(e, 'request_id'):
+                        e.request_id = request_id
                     
-                    self._logger.debug(f"Waiting {delay:.2f}s before retry [ID: {request_id}]")
-                    # Wait before retrying
-                    time.sleep(delay)
-                    continue
+                    # Log error with request ID (issue #26, #28)
+                    self._logger.warning(f"GET request failed [ID: {request_id}] (attempt {attempt + 1}/{max_retries + 1}): {type(e).__name__}: {sanitize_api_key_for_logging(str(e), self._api_key)}")
+                    
+                    # Check if we should retry (e.g., 5xx errors)
+                    if self._retry_config and should_retry(e, e.status_code):
+                        if attempt >= max_retries:
+                            break
+                        
+                        delay = exponential_backoff(
+                            attempt,
+                            base_delay=self._retry_config.base_delay,
+                            max_delay=self._retry_config.max_delay,
+                            exponential_base=self._retry_config.exponential_base,
+                            jitter=self._retry_config.jitter
+                        )
+                        
+                        self._logger.debug(f"Waiting {delay:.2f}s before retry [ID: {request_id}]")
+                        time.sleep(delay)
+                        continue
+                    else:
+                        # Non-retryable exception - raise immediately
+                        raise
+                except requests.exceptions.RequestException as e:
+                    # Other request exceptions - don't retry
+                    error_msg = sanitize_api_key_for_logging(str(e), self._api_key)
+                    self._logger.error(f"GET request failed [ID: {request_id}]: {error_msg}", exc_info=True)
+                    error = GoogleMapsAPIError(f"Request failed: {error_msg}", request_url=url)
+                    error.request_id = request_id
+                    raise error from e
+            
+            # If we get here, all retries failed
+            if last_exception:
+                error_msg = sanitize_api_key_for_logging(str(last_exception), self._api_key)
+                self._logger.error(f"GET request failed after {max_retries + 1} attempts [ID: {last_request_id}]: {error_msg}", exc_info=True)
+                if isinstance(last_exception, (requests.exceptions.Timeout, requests.exceptions.ConnectionError)):
+                    # Sanitize error message to prevent API key exposure (issue #7)
+                    error = GoogleMapsAPIError(f"Request failed after {max_retries + 1} attempts: {error_msg}", request_url=url)
+                    error.request_id = last_request_id
+                    raise error from last_exception
                 else:
-                    # Non-retryable exception - raise immediately
-                    break
-            except GoogleMapsAPIError as e:
-                last_exception = e
-                
-                # Store request ID in exception (issue #28)
-                if not hasattr(e, 'request_id'):
-                    e.request_id = request_id
-                
-                # Log error with request ID (issue #26, #28)
-                self._logger.warning(f"GET request failed [ID: {request_id}] (attempt {attempt + 1}/{max_retries + 1}): {type(e).__name__}: {sanitize_api_key_for_logging(str(e), self._api_key)}")
-                
-                # Check if we should retry (e.g., 5xx errors)
-                if self._retry_config and should_retry(e, e.status_code):
-                    if attempt >= max_retries:
-                        break
-                    
-                    delay = exponential_backoff(
-                        attempt,
-                        base_delay=self._retry_config.base_delay,
-                        max_delay=self._retry_config.max_delay,
-                        exponential_base=self._retry_config.exponential_base,
-                        jitter=self._retry_config.jitter
-                    )
-                    
-                    self._logger.debug(f"Waiting {delay:.2f}s before retry [ID: {request_id}]")
-                    time.sleep(delay)
-                    continue
-                else:
-                    # Non-retryable exception - raise immediately
-                    raise
-            except requests.exceptions.RequestException as e:
-                # Other request exceptions - don't retry
-                error_msg = sanitize_api_key_for_logging(str(e), self._api_key)
-                self._logger.error(f"GET request failed [ID: {request_id}]: {error_msg}", exc_info=True)
-                error = GoogleMapsAPIError(f"Request failed: {error_msg}", request_url=url)
-                error.request_id = request_id
-                raise error from e
+                    if isinstance(last_exception, GoogleMapsAPIError) and not hasattr(last_exception, 'request_id'):
+                        last_exception.request_id = last_request_id
+                    raise last_exception
+            
+            # Should never reach here
+            self._logger.error(f"GET request failed: Unknown error [ID: {request_id}]")
+            error = GoogleMapsAPIError("Request failed: Unknown error", request_url=url)
+            error.request_id = request_id
+            raise error
         
-        # If we get here, all retries failed
-        if last_exception:
-            error_msg = sanitize_api_key_for_logging(str(last_exception), self._api_key)
-            self._logger.error(f"GET request failed after {max_retries + 1} attempts [ID: {last_request_id}]: {error_msg}", exc_info=True)
-            if isinstance(last_exception, (requests.exceptions.Timeout, requests.exceptions.ConnectionError)):
-                # Sanitize error message to prevent API key exposure (issue #7)
-                error = GoogleMapsAPIError(f"Request failed after {max_retries + 1} attempts: {error_msg}", request_url=url)
-                error.request_id = last_request_id
-                raise error from last_exception
-            else:
-                if isinstance(last_exception, GoogleMapsAPIError) and not hasattr(last_exception, 'request_id'):
-                    last_exception.request_id = last_request_id
-                raise last_exception
-        
-        # Should never reach here
-        self._logger.error(f"GET request failed: Unknown error [ID: {request_id}]")
-        error = GoogleMapsAPIError("Request failed: Unknown error", request_url=url)
-        error.request_id = request_id
-        raise error
+        # Execute request with circuit breaker protection (issue #39)
+        if self._circuit_breaker is not None:
+            return self._circuit_breaker.call(_make_request)
+        else:
+            return _make_request()
 
     def _post(
         self,
@@ -490,126 +504,135 @@ class BaseClient:
                 self._logger.debug(f"Cache hit [ID: {request_id}]: {url}")
                 return cached_response
         
-        # Log request (issue #26, #28)
-        self._logger.debug(f"POST request [ID: {request_id}]: {url} with data keys: {list(data.keys()) if data else 'None'}")
-        
-        # Call request hooks (issue #35)
-        headers_with_id = headers.copy() if headers else {}
-        headers_with_id['X-Request-ID'] = request_id
-        for hook in self._request_hooks:
-            try:
-                hook("POST", url, headers_with_id, params, data)
-            except Exception as e:
-                self._logger.warning(f"Request hook raised exception: {e}", exc_info=True)
-        
-        # Retry logic (issue #11)
-        last_exception = None
-        last_request_id = request_id
-        
-        max_retries = self._retry_config.max_retries if self._retry_config else 0
-        
-        for attempt in range(max_retries + 1):
-            # Generate new request ID for retries
-            if attempt > 0:
-                request_id = str(uuid.uuid4())
-                last_request_id = request_id
-                self._logger.info(f"Retry attempt {attempt}/{max_retries} for POST {url} [ID: {request_id}]")
-                # Update headers with new request ID
-                headers_with_id = headers.copy() if headers else {}
-                headers_with_id['X-Request-ID'] = request_id
-                # Call request hooks for retry (issue #35)
-                for hook in self._request_hooks:
-                    try:
-                        hook("POST", url, headers_with_id, params, data)
-                    except Exception as e:
-                        self._logger.warning(f"Request hook raised exception: {e}", exc_info=True)
+        # Define the actual request function for circuit breaker (issue #39)
+        def _make_request():
+            nonlocal request_id
+            # Log request (issue #26, #28)
+            self._logger.debug(f"POST request [ID: {request_id}]: {url} with data keys: {list(data.keys()) if data else 'None'}")
             
-            try:
-                response = self.session.post(
-                    url, json=data, headers=headers_with_id, params=params, timeout=request_timeout
-                )
+            # Call request hooks (issue #35)
+            headers_with_id = headers.copy() if headers else {}
+            headers_with_id['X-Request-ID'] = request_id
+            for hook in self._request_hooks:
+                try:
+                    hook("POST", url, headers_with_id, params, data)
+                except Exception as e:
+                    self._logger.warning(f"Request hook raised exception: {e}", exc_info=True)
+            
+            # Retry logic (issue #11)
+            last_exception = None
+            last_request_id = request_id
+            
+            max_retries = self._retry_config.max_retries if self._retry_config else 0
+            
+            for attempt in range(max_retries + 1):
+                # Generate new request ID for retries
+                if attempt > 0:
+                    request_id = str(uuid.uuid4())
+                    last_request_id = request_id
+                    self._logger.info(f"Retry attempt {attempt}/{max_retries} for POST {url} [ID: {request_id}]")
+                    # Update headers with new request ID
+                    headers_with_id = headers.copy() if headers else {}
+                    headers_with_id['X-Request-ID'] = request_id
+                    # Call request hooks for retry (issue #35)
+                    for hook in self._request_hooks:
+                        try:
+                            hook("POST", url, headers_with_id, params, data)
+                        except Exception as e:
+                            self._logger.warning(f"Request hook raised exception: {e}", exc_info=True)
                 
-                # Call response hooks (issue #35)
-                for hook in self._response_hooks:
-                    try:
-                        hook(response)
-                    except Exception as e:
-                        self._logger.warning(f"Response hook raised exception: {e}", exc_info=True)
-                
-                # Log response (issue #26, #28)
-                self._logger.debug(f"POST response [ID: {request_id}]: {url} - Status: {response.status_code}")
-                
-                # _handle_response may raise GoogleMapsAPIError for HTTP errors
-                result = self._handle_response(response, request_id=request_id)
-                
-                # Cache successful response (issue #37)
-                if self._cache is not None and attempt == 0:  # Only cache on first successful attempt
-                    cache_key = generate_cache_key("POST", url, params, data)
-                    self._cache[cache_key] = result
-                    self._logger.debug(f"Cached response [ID: {request_id}]: {url}")
-                
-                return result
-            except (requests.exceptions.Timeout, requests.exceptions.ConnectionError) as e:
-                last_exception = e
-                
-                # Check if we should retry
-                if self._retry_config and should_retry(e, None):
-                    # Don't retry on last attempt
-                    if attempt >= max_retries:
-                        break
-                    
-                    # Calculate backoff delay
-                    delay = exponential_backoff(
-                        attempt,
-                        base_delay=self._retry_config.base_delay,
-                        max_delay=self._retry_config.max_delay,
-                        exponential_base=self._retry_config.exponential_base,
-                        jitter=self._retry_config.jitter
+                try:
+                    response = self.session.post(
+                        url, json=data, headers=headers_with_id, params=params, timeout=request_timeout
                     )
                     
-                    # Wait before retrying
-                    time.sleep(delay)
-                    continue
-                else:
-                    # Non-retryable exception - raise immediately
-                    break
-            except GoogleMapsAPIError as e:
-                last_exception = e
-                
-                # Check if we should retry (e.g., 5xx errors)
-                if self._retry_config and should_retry(e, e.status_code):
-                    if attempt >= max_retries:
+                    # Call response hooks (issue #35)
+                    for hook in self._response_hooks:
+                        try:
+                            hook(response)
+                        except Exception as e:
+                            self._logger.warning(f"Response hook raised exception: {e}", exc_info=True)
+                    
+                    # Log response (issue #26, #28)
+                    self._logger.debug(f"POST response [ID: {request_id}]: {url} - Status: {response.status_code}")
+                    
+                    # _handle_response may raise GoogleMapsAPIError for HTTP errors
+                    result = self._handle_response(response, request_id=request_id)
+                    
+                    # Cache successful response (issue #37)
+                    if self._cache is not None and attempt == 0:  # Only cache on first successful attempt
+                        cache_key = generate_cache_key("POST", url, params, data)
+                        self._cache[cache_key] = result
+                        self._logger.debug(f"Cached response [ID: {request_id}]: {url}")
+                    
+                    return result
+                except (requests.exceptions.Timeout, requests.exceptions.ConnectionError) as e:
+                    last_exception = e
+                    
+                    # Check if we should retry
+                    if self._retry_config and should_retry(e, None):
+                        # Don't retry on last attempt
+                        if attempt >= max_retries:
+                            break
+                        
+                        # Calculate backoff delay
+                        delay = exponential_backoff(
+                            attempt,
+                            base_delay=self._retry_config.base_delay,
+                            max_delay=self._retry_config.max_delay,
+                            exponential_base=self._retry_config.exponential_base,
+                            jitter=self._retry_config.jitter
+                        )
+                        
+                        # Wait before retrying
+                        time.sleep(delay)
+                        continue
+                    else:
+                        # Non-retryable exception - raise immediately
                         break
+                except GoogleMapsAPIError as e:
+                    last_exception = e
                     
-                    delay = exponential_backoff(
-                        attempt,
-                        base_delay=self._retry_config.base_delay,
-                        max_delay=self._retry_config.max_delay,
-                        exponential_base=self._retry_config.exponential_base,
-                        jitter=self._retry_config.jitter
-                    )
-                    
-                    time.sleep(delay)
-                    continue
+                    # Check if we should retry (e.g., 5xx errors)
+                    if self._retry_config and should_retry(e, e.status_code):
+                        if attempt >= max_retries:
+                            break
+                        
+                        delay = exponential_backoff(
+                            attempt,
+                            base_delay=self._retry_config.base_delay,
+                            max_delay=self._retry_config.max_delay,
+                            exponential_base=self._retry_config.exponential_base,
+                            jitter=self._retry_config.jitter
+                        )
+                        
+                        time.sleep(delay)
+                        continue
+                    else:
+                        # Non-retryable exception - raise immediately
+                        raise
+                except requests.exceptions.RequestException as e:
+                    # Other request exceptions - don't retry
+                    error_msg = sanitize_api_key_for_logging(str(e), self._api_key)
+                    raise GoogleMapsAPIError(f"Request failed: {error_msg}") from e
+            
+            # If we get here, all retries failed
+            if last_exception:
+                if isinstance(last_exception, (requests.exceptions.Timeout, requests.exceptions.ConnectionError)):
+                    # Sanitize error message to prevent API key exposure (issue #7)
+                    error_msg = sanitize_api_key_for_logging(str(last_exception), self._api_key)
+                    raise GoogleMapsAPIError(f"Request failed after {max_retries + 1} attempts: {error_msg}") from last_exception
                 else:
-                    # Non-retryable exception - raise immediately
-                    raise
-            except requests.exceptions.RequestException as e:
-                # Other request exceptions - don't retry
-                error_msg = sanitize_api_key_for_logging(str(e), self._api_key)
-                raise GoogleMapsAPIError(f"Request failed: {error_msg}") from e
+                    raise last_exception
+            
+            # Should never reach here
+            raise GoogleMapsAPIError("Request failed: Unknown error")
         
-        # If we get here, all retries failed
-        if last_exception:
-            if isinstance(last_exception, (requests.exceptions.Timeout, requests.exceptions.ConnectionError)):
-                # Sanitize error message to prevent API key exposure (issue #7)
-                error_msg = sanitize_api_key_for_logging(str(last_exception), self._api_key)
-                raise GoogleMapsAPIError(f"Request failed after {max_retries + 1} attempts: {error_msg}") from last_exception
-            else:
-                raise last_exception
-        
-        # Should never reach here
-        raise GoogleMapsAPIError("Request failed: Unknown error")
+        # Execute request with circuit breaker protection (issue #39)
+        if self._circuit_breaker is not None:
+            return self._circuit_breaker.call(_make_request)
+        else:
+            return _make_request()
 
     def _handle_response(self, response: requests.Response, request_id: Optional[str] = None) -> Dict[str, Any]:
         """

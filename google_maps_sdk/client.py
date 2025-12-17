@@ -12,6 +12,7 @@ from .retry import RetryConfig
 
 if TYPE_CHECKING:
     from requests.adapters import HTTPAdapter
+    from .circuit_breaker import CircuitBreaker
 
 
 class GoogleMapsClient:
@@ -33,6 +34,7 @@ class GoogleMapsClient:
         cache_ttl: float = 300.0,
         cache_maxsize: int = 100,
         http_adapter: Optional['HTTPAdapter'] = None,
+        circuit_breaker: Optional['CircuitBreaker'] = None,
     ):
         """
         Initialize Google Maps Platform client
@@ -47,6 +49,7 @@ class GoogleMapsClient:
             cache_ttl: Cache time-to-live in seconds (default: 300.0 = 5 minutes) (issue #37)
             cache_maxsize: Maximum number of cached responses (default: 100) (issue #37)
             http_adapter: Custom HTTPAdapter for proxies, custom SSL, etc. (None to use default) (issue #38)
+            circuit_breaker: CircuitBreaker instance for failure protection (None to disable) (issue #39)
 
         Example:
             >>> client = GoogleMapsClient(api_key="YOUR_API_KEY")
@@ -67,7 +70,7 @@ class GoogleMapsClient:
         self.api_key = api_key
         self.timeout = timeout
 
-        # Initialize sub-clients with rate limiting, retry, cache, and custom adapter
+        # Initialize sub-clients with rate limiting, retry, cache, custom adapter, and circuit breaker
         self.routes = RoutesClient(
             api_key, 
             timeout,
@@ -78,6 +81,7 @@ class GoogleMapsClient:
             cache_ttl=cache_ttl,
             cache_maxsize=cache_maxsize,
             http_adapter=http_adapter,
+            circuit_breaker=circuit_breaker,
         )
         self.directions = DirectionsClient(
             api_key, 
@@ -89,6 +93,7 @@ class GoogleMapsClient:
             cache_ttl=cache_ttl,
             cache_maxsize=cache_maxsize,
             http_adapter=http_adapter,
+            circuit_breaker=circuit_breaker,
         )
         self.roads = RoadsClient(
             api_key, 
@@ -100,6 +105,7 @@ class GoogleMapsClient:
             cache_ttl=cache_ttl,
             cache_maxsize=cache_maxsize,
             http_adapter=http_adapter,
+            circuit_breaker=circuit_breaker,
         )
 
     def set_api_key(self, api_key: str) -> None:
