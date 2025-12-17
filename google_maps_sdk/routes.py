@@ -13,6 +13,7 @@ from .types import RouteResponse, RouteMatrixResponse
 if TYPE_CHECKING:
     from requests.adapters import HTTPAdapter
     from .circuit_breaker import CircuitBreaker
+    from .config import ClientConfig
 
 from .utils import (
     validate_waypoint_count,
@@ -33,11 +34,13 @@ class RoutesClient(BaseClient):
     """Client for Google Maps Routes API"""
 
     BASE_URL = "https://routes.googleapis.com"
+    DEFAULT_API_VERSION = "v2"
 
     def __init__(
         self, 
         api_key: Optional[str] = None, 
         timeout: int = 30,
+        api_version: Optional[str] = None,
         rate_limit_max_calls: Optional[int] = None,
         rate_limit_period: Optional[float] = None,
         retry_config: Optional[RetryConfig] = None,
@@ -49,6 +52,7 @@ class RoutesClient(BaseClient):
         enable_request_compression: bool = False,
         compression_threshold: int = 1024,
         json_encoder: Optional[type] = None,
+        config: Optional['ClientConfig'] = None,
     ):
         """
         Initialize Routes API client
@@ -56,6 +60,7 @@ class RoutesClient(BaseClient):
         Args:
             api_key: Google Maps Platform API key (optional, can use GOOGLE_MAPS_API_KEY env var) (issue #31)
             timeout: Request timeout in seconds
+            api_version: API version (e.g., "v2", "v3") (default: "v2") (issue #76)
             rate_limit_max_calls: Maximum calls per period for rate limiting (None to disable)
             rate_limit_period: Time period in seconds for rate limiting (default: 60.0)
             retry_config: Retry configuration (None to disable retries) (issue #11)
@@ -67,7 +72,31 @@ class RoutesClient(BaseClient):
             enable_request_compression: Enable gzip compression for large POST requests (default: False) (issue #49)
             compression_threshold: Minimum payload size in bytes to compress (default: 1024) (issue #49)
             json_encoder: Custom JSON encoder class for encoding request data (None to use default) (issue #51)
+            config: ClientConfig object to centralize configuration (issue #75). If provided, other parameters are ignored.
         """
+        # If config object is provided, use it (issue #75, #76)
+        if config is not None:
+            api_key = config.api_key
+            timeout = config.timeout
+            api_version = config.api_version
+            rate_limit_max_calls = config.rate_limit_max_calls
+            rate_limit_period = config.rate_limit_period
+            retry_config = config.retry_config
+            enable_cache = config.enable_cache
+            cache_ttl = config.cache_ttl
+            cache_maxsize = config.cache_maxsize
+            http_adapter = config.http_adapter
+            circuit_breaker = config.circuit_breaker
+            enable_request_compression = config.enable_request_compression
+            compression_threshold = config.compression_threshold
+            json_encoder = config.json_encoder
+        
+        # Validate and set API version (issue #76)
+        from .utils import validate_api_version
+        if api_version is None:
+            api_version = self.DEFAULT_API_VERSION
+        self._api_version = validate_api_version(api_version)
+        
         super().__init__(
             api_key, 
             self.BASE_URL, 
@@ -388,7 +417,7 @@ class RoutesClient(BaseClient):
         if polyline_encoding:
             polyline_encoding = validate_enum_value(polyline_encoding, VALID_POLYLINE_ENCODING, "polyline_encoding")
         
-        endpoint = "/directions/v2:computeRoutes"
+        endpoint = f"/directions/{self._api_version}:computeRoutes"
         
         request_body: Dict[str, Any] = {
             "origin": origin,
@@ -484,7 +513,7 @@ class RoutesClient(BaseClient):
         if field_mask:
             field_mask = validate_field_mask(field_mask)
         
-        endpoint = "/distanceMatrix/v2:computeRouteMatrix"
+        endpoint = f"/distanceMatrix/{self._api_version}:computeRouteMatrix"
 
         request_body: Dict[str, Any] = {
             "origins": origins,

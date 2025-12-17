@@ -440,6 +440,40 @@ def validate_language_code(language_code: Optional[str]) -> Optional[str]:
     return language_code
 
 
+def validate_api_version(api_version: Optional[str]) -> Optional[str]:
+    """
+    Validate API version format (issue #76)
+    
+    Args:
+        api_version: API version string (e.g., "v1", "v2")
+        
+    Returns:
+        Validated API version string
+        
+    Raises:
+        ValueError: If API version format is invalid
+    """
+    if api_version is None:
+        return None
+    
+    if not isinstance(api_version, str):
+        raise TypeError("API version must be a string")
+    
+    api_version = api_version.strip()
+    
+    if not api_version:
+        raise ValueError("API version cannot be empty or whitespace-only")
+    
+    # Validate format: should start with 'v' followed by digits
+    import re
+    version_pattern = re.compile(r'^v\d+$', re.IGNORECASE)
+    
+    if not version_pattern.match(api_version):
+        raise ValueError(f"Invalid API version format: {api_version}. Expected format: 'v1', 'v2', 'v3', etc.")
+    
+    return api_version.lower()  # Normalize to lowercase
+
+
 def validate_units(units: Optional[str]) -> Optional[str]:
     """
     Validate units parameter (issue #44)
