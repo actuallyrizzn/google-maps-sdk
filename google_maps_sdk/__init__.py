@@ -7,6 +7,15 @@ A comprehensive Python SDK for Google Maps Platform APIs including:
 - Roads API
 """
 
+import sys
+
+# Check minimum Python version
+if sys.version_info < (3, 8):
+    raise RuntimeError(
+        "google-maps-sdk requires Python 3.8 or higher. "
+        f"Current version: {sys.version_info.major}.{sys.version_info.minor}"
+    )
+
 from .client import GoogleMapsClient
 from .routes import RoutesClient
 from .directions import DirectionsClient
