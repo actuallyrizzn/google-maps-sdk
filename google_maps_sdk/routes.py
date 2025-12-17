@@ -98,6 +98,9 @@ class RoutesClient(BaseClient):
         # Use provided timeout or default
         request_timeout = timeout if timeout is not None else self.timeout
         
+        # Log request (issue #26)
+        self._logger.debug(f"POST request: {url} with data keys: {list(data.keys()) if data else 'None'}")
+        
         # Retry logic (issue #11) - RoutesClient has its own _post, so we need retry here too
         from .retry import should_retry, exponential_backoff
         import time
@@ -109,12 +112,22 @@ class RoutesClient(BaseClient):
         
         for attempt in range(max_retries + 1):
             try:
+                if attempt > 0:
+                    self._logger.info(f"Retry attempt {attempt}/{max_retries} for POST {url}")
+                
                 response = self.session.post(
                     url, json=data, headers=headers, params=params, timeout=request_timeout
                 )
+                
+                # Log response (issue #26)
+                self._logger.debug(f"POST response: {url} - Status: {response.status_code}")
+                
                 return self._handle_response(response)
             except (requests.exceptions.Timeout, requests.exceptions.ConnectionError) as e:
                 last_exception = e
+                
+                # Log error (issue #26)
+                self._logger.warning(f"POST request failed (attempt {attempt + 1}/{max_retries + 1}): {type(e).__name__}: {sanitize_api_key_for_logging(str(e), self._api_key)}")
                 
                 if self._retry_config and should_retry(e, None):
                     if attempt >= max_retries:
@@ -127,12 +140,16 @@ class RoutesClient(BaseClient):
                         exponential_base=self._retry_config.exponential_base,
                         jitter=self._retry_config.jitter
                     )
+                    self._logger.debug(f"Waiting {delay:.2f}s before retry")
                     time.sleep(delay)
                     continue
                 else:
                     break
             except GoogleMapsAPIError as e:
                 last_exception = e
+                
+                # Log error (issue #26)
+                self._logger.warning(f"POST request failed (attempt {attempt + 1}/{max_retries + 1}): {type(e).__name__}: {sanitize_api_key_for_logging(str(e), self._api_key)}")
                 
                 if self._retry_config and should_retry(e, e.status_code):
                     if attempt >= max_retries:
@@ -145,21 +162,26 @@ class RoutesClient(BaseClient):
                         exponential_base=self._retry_config.exponential_base,
                         jitter=self._retry_config.jitter
                     )
+                    self._logger.debug(f"Waiting {delay:.2f}s before retry")
                     time.sleep(delay)
                     continue
                 else:
                     raise
             except requests.exceptions.RequestException as e:
                 error_msg = sanitize_api_key_for_logging(str(e), self._api_key)
+                self._logger.error(f"POST request failed: {error_msg}", exc_info=True)
                 raise GoogleMapsAPIError(f"Request failed: {error_msg}") from e
         
         if last_exception:
+            error_msg = sanitize_api_key_for_logging(str(last_exception), self._api_key)
+            self._logger.error(f"POST request failed after {max_retries + 1} attempts: {error_msg}", exc_info=True)
             if isinstance(last_exception, (requests.exceptions.Timeout, requests.exceptions.ConnectionError)):
                 error_msg = sanitize_api_key_for_logging(str(last_exception), self._api_key)
                 raise GoogleMapsAPIError(f"Request failed after {max_retries + 1} attempts: {error_msg}") from last_exception
             else:
                 raise last_exception
         
+        self._logger.error("POST request failed: Unknown error")
         raise GoogleMapsAPIError("Request failed: Unknown error")
 
     def compute_routes(

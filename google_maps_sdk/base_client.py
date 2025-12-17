@@ -6,6 +6,7 @@ import requests
 import warnings
 import time
 import threading
+import logging
 from typing import Optional, Dict, Any
 from .exceptions import (
     handle_http_error,
@@ -86,6 +87,9 @@ class BaseClient:
                 'Accept-Encoding': 'gzip, deflate, br'
             }
         }
+        
+        # Initialize logger (issue #26)
+        self._logger = logging.getLogger(f"{__name__}.{self.__class__.__name__}")
 
     @property
     def api_key(self) -> str:
@@ -167,6 +171,9 @@ class BaseClient:
         # Use provided timeout or default (issue #12)
         request_timeout = timeout if timeout is not None else self.timeout
         
+        # Log request (issue #26)
+        self._logger.debug(f"GET request: {url} with params: {sanitize_api_key_for_logging(str(params), self._api_key)}")
+        
         # Retry logic (issue #11)
         last_exception = None
         
@@ -174,7 +181,14 @@ class BaseClient:
         
         for attempt in range(max_retries + 1):
             try:
+                if attempt > 0:
+                    self._logger.info(f"Retry attempt {attempt}/{max_retries} for GET {url}")
+                
                 response = self.session.get(url, params=params, timeout=request_timeout)
+                
+                # Log response (issue #26)
+                self._logger.debug(f"GET response: {url} - Status: {response.status_code}")
+                
                 # _handle_response may raise GoogleMapsAPIError for HTTP errors
                 return self._handle_response(response)
             except (requests.exceptions.Timeout, requests.exceptions.ConnectionError) as e:
@@ -281,6 +295,9 @@ class BaseClient:
         # Use provided timeout or default (issue #12)
         request_timeout = timeout if timeout is not None else self.timeout
         
+        # Log request (issue #26)
+        self._logger.debug(f"POST request: {url} with data keys: {list(data.keys()) if data else 'None'}")
+        
         # Retry logic (issue #11)
         last_exception = None
         
@@ -288,9 +305,16 @@ class BaseClient:
         
         for attempt in range(max_retries + 1):
             try:
+                if attempt > 0:
+                    self._logger.info(f"Retry attempt {attempt}/{max_retries} for POST {url}")
+                
                 response = self.session.post(
                     url, json=data, headers=headers, params=params, timeout=request_timeout
                 )
+                
+                # Log response (issue #26)
+                self._logger.debug(f"POST response: {url} - Status: {response.status_code}")
+                
                 # _handle_response may raise GoogleMapsAPIError for HTTP errors
                 return self._handle_response(response)
             except (requests.exceptions.Timeout, requests.exceptions.ConnectionError) as e:
@@ -383,6 +407,7 @@ class BaseClient:
 
         # Check for API errors in response
         if response.status_code >= 400:
+            self._logger.warning(f"HTTP error {response.status_code} for {response.url}: {sanitize_api_key_for_logging(str(data), self._api_key)}")
             raise handle_http_error(response.status_code, data, response.url)
 
         # Check for Directions API status codes
