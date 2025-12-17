@@ -7,6 +7,7 @@ import warnings
 import time
 import threading
 import logging
+import uuid
 from typing import Optional, Dict, Any
 from requests.adapters import HTTPAdapter
 from urllib3.util.retry import Retry
@@ -186,28 +187,41 @@ class BaseClient:
         # Use provided timeout or default (issue #12)
         request_timeout = timeout if timeout is not None else self.timeout
         
-        # Log request (issue #26)
-        self._logger.debug(f"GET request: {url} with params: {sanitize_api_key_for_logging(str(params), self._api_key)}")
+        # Generate request ID for tracking (issue #28)
+        request_id = str(uuid.uuid4())
+        
+        # Log request (issue #26, #28)
+        self._logger.debug(f"GET request [ID: {request_id}]: {url} with params: {sanitize_api_key_for_logging(str(params), self._api_key)}")
         
         # Retry logic (issue #11)
         last_exception = None
+        last_request_id = request_id
         
         max_retries = self._retry_config.max_retries if self._retry_config else 0
         
         for attempt in range(max_retries + 1):
+            # Generate new request ID for retries
+            if attempt > 0:
+                request_id = str(uuid.uuid4())
+                last_request_id = request_id
+                self._logger.info(f"Retry attempt {attempt}/{max_retries} for GET {url} [ID: {request_id}]")
+            
             try:
-                if attempt > 0:
-                    self._logger.info(f"Retry attempt {attempt}/{max_retries} for GET {url}")
+                # Add request ID to headers (issue #28)
+                headers = {'X-Request-ID': request_id}
                 
-                response = self.session.get(url, params=params, timeout=request_timeout)
+                response = self.session.get(url, params=params, headers=headers, timeout=request_timeout)
                 
-                # Log response (issue #26)
-                self._logger.debug(f"GET response: {url} - Status: {response.status_code}")
+                # Log response (issue #26, #28)
+                self._logger.debug(f"GET response [ID: {request_id}]: {url} - Status: {response.status_code}")
                 
                 # _handle_response may raise GoogleMapsAPIError for HTTP errors
-                return self._handle_response(response)
+                return self._handle_response(response, request_id=request_id)
             except (requests.exceptions.Timeout, requests.exceptions.ConnectionError) as e:
                 last_exception = e
+                
+                # Log error with request ID (issue #26, #28)
+                self._logger.warning(f"GET request failed [ID: {request_id}] (attempt {attempt + 1}/{max_retries + 1}): {type(e).__name__}: {sanitize_api_key_for_logging(str(e), self._api_key)}")
                 
                 # Check if we should retry
                 if self._retry_config and should_retry(e, None):
@@ -224,6 +238,7 @@ class BaseClient:
                         jitter=self._retry_config.jitter
                     )
                     
+                    self._logger.debug(f"Waiting {delay:.2f}s before retry [ID: {request_id}]")
                     # Wait before retrying
                     time.sleep(delay)
                     continue
@@ -232,6 +247,13 @@ class BaseClient:
                     break
             except GoogleMapsAPIError as e:
                 last_exception = e
+                
+                # Store request ID in exception (issue #28)
+                if not hasattr(e, 'request_id'):
+                    e.request_id = request_id
+                
+                # Log error with request ID (issue #26, #28)
+                self._logger.warning(f"GET request failed [ID: {request_id}] (attempt {attempt + 1}/{max_retries + 1}): {type(e).__name__}: {sanitize_api_key_for_logging(str(e), self._api_key)}")
                 
                 # Check if we should retry (e.g., 5xx errors)
                 if self._retry_config and should_retry(e, e.status_code):
@@ -246,6 +268,7 @@ class BaseClient:
                         jitter=self._retry_config.jitter
                     )
                     
+                    self._logger.debug(f"Waiting {delay:.2f}s before retry [ID: {request_id}]")
                     time.sleep(delay)
                     continue
                 else:
@@ -254,19 +277,30 @@ class BaseClient:
             except requests.exceptions.RequestException as e:
                 # Other request exceptions - don't retry
                 error_msg = sanitize_api_key_for_logging(str(e), self._api_key)
-                raise GoogleMapsAPIError(f"Request failed: {error_msg}") from e
+                self._logger.error(f"GET request failed [ID: {request_id}]: {error_msg}", exc_info=True)
+                error = GoogleMapsAPIError(f"Request failed: {error_msg}", request_url=url)
+                error.request_id = request_id
+                raise error from e
         
         # If we get here, all retries failed
         if last_exception:
+            error_msg = sanitize_api_key_for_logging(str(last_exception), self._api_key)
+            self._logger.error(f"GET request failed after {max_retries + 1} attempts [ID: {last_request_id}]: {error_msg}", exc_info=True)
             if isinstance(last_exception, (requests.exceptions.Timeout, requests.exceptions.ConnectionError)):
                 # Sanitize error message to prevent API key exposure (issue #7)
-                error_msg = sanitize_api_key_for_logging(str(last_exception), self._api_key)
-                raise GoogleMapsAPIError(f"Request failed after {max_retries + 1} attempts: {error_msg}") from last_exception
+                error = GoogleMapsAPIError(f"Request failed after {max_retries + 1} attempts: {error_msg}", request_url=url)
+                error.request_id = last_request_id
+                raise error from last_exception
             else:
+                if isinstance(last_exception, GoogleMapsAPIError) and not hasattr(last_exception, 'request_id'):
+                    last_exception.request_id = last_request_id
                 raise last_exception
         
         # Should never reach here
-        raise GoogleMapsAPIError("Request failed: Unknown error")
+        self._logger.error(f"GET request failed: Unknown error [ID: {request_id}]")
+        error = GoogleMapsAPIError("Request failed: Unknown error", request_url=url)
+        error.request_id = request_id
+        raise error
 
     def _post(
         self,
@@ -310,28 +344,39 @@ class BaseClient:
         # Use provided timeout or default (issue #12)
         request_timeout = timeout if timeout is not None else self.timeout
         
-        # Log request (issue #26)
-        self._logger.debug(f"POST request: {url} with data keys: {list(data.keys()) if data else 'None'}")
+        # Generate request ID for tracking (issue #28)
+        request_id = str(uuid.uuid4())
+        
+        # Log request (issue #26, #28)
+        self._logger.debug(f"POST request [ID: {request_id}]: {url} with data keys: {list(data.keys()) if data else 'None'}")
         
         # Retry logic (issue #11)
         last_exception = None
+        last_request_id = request_id
         
         max_retries = self._retry_config.max_retries if self._retry_config else 0
         
         for attempt in range(max_retries + 1):
+            # Generate new request ID for retries
+            if attempt > 0:
+                request_id = str(uuid.uuid4())
+                last_request_id = request_id
+                self._logger.info(f"Retry attempt {attempt}/{max_retries} for POST {url} [ID: {request_id}]")
+            
             try:
-                if attempt > 0:
-                    self._logger.info(f"Retry attempt {attempt}/{max_retries} for POST {url}")
+                # Add request ID to headers (issue #28)
+                headers_with_id = headers.copy() if headers else {}
+                headers_with_id['X-Request-ID'] = request_id
                 
                 response = self.session.post(
-                    url, json=data, headers=headers, params=params, timeout=request_timeout
+                    url, json=data, headers=headers_with_id, params=params, timeout=request_timeout
                 )
                 
-                # Log response (issue #26)
-                self._logger.debug(f"POST response: {url} - Status: {response.status_code}")
+                # Log response (issue #26, #28)
+                self._logger.debug(f"POST response [ID: {request_id}]: {url} - Status: {response.status_code}")
                 
                 # _handle_response may raise GoogleMapsAPIError for HTTP errors
-                return self._handle_response(response)
+                return self._handle_response(response, request_id=request_id)
             except (requests.exceptions.Timeout, requests.exceptions.ConnectionError) as e:
                 last_exception = e
                 
@@ -394,12 +439,13 @@ class BaseClient:
         # Should never reach here
         raise GoogleMapsAPIError("Request failed: Unknown error")
 
-    def _handle_response(self, response: requests.Response) -> Dict[str, Any]:
+    def _handle_response(self, response: requests.Response, request_id: Optional[str] = None) -> Dict[str, Any]:
         """
-        Handle HTTP response and convert to appropriate format
+        Handle HTTP response and convert to appropriate format (issue #28)
 
         Args:
             response: HTTP response object
+            request_id: Optional request ID for correlation
 
         Returns:
             Response JSON as dictionary
@@ -413,17 +459,19 @@ class BaseClient:
         except ValueError:
             # If not JSON, check status code
             if response.status_code >= 400:
-                raise GoogleMapsAPIError(
+                error = GoogleMapsAPIError(
                     f"HTTP {response.status_code}: {response.text}",
                     status_code=response.status_code,
                     request_url=str(response.url) if hasattr(response, 'url') else None,
+                    request_id=request_id,
                 )
+                raise error
             return {"status": "OK", "raw": response.text}
 
         # Check for API errors in response
         if response.status_code >= 400:
-            self._logger.warning(f"HTTP error {response.status_code} for {response.url}: {sanitize_api_key_for_logging(str(data), self._api_key)}")
-            raise handle_http_error(response.status_code, data, response.url)
+            self._logger.warning(f"HTTP error {response.status_code} for {response.url} [ID: {request_id or 'N/A'}]: {sanitize_api_key_for_logging(str(data), self._api_key)}")
+            raise handle_http_error(response.status_code, data, response.url, request_id=request_id)
 
         # Check for Directions API status codes
         if "status" in data and data["status"] != "OK":
@@ -432,17 +480,17 @@ class BaseClient:
             
             request_url = str(response.url) if hasattr(response, 'url') else None
             if status == "REQUEST_DENIED":
-                raise PermissionDeniedError(error_message, data, request_url)
+                raise PermissionDeniedError(error_message, data, request_url, request_id=request_id)
             elif status == "OVER_QUERY_LIMIT":
-                raise QuotaExceededError(error_message, data, request_url)
+                raise QuotaExceededError(error_message, data, request_url, request_id=request_id)
             elif status == "NOT_FOUND":
-                raise NotFoundError(error_message, data, request_url)
+                raise NotFoundError(error_message, data, request_url, request_id=request_id)
             elif status == "ZERO_RESULTS":
-                raise NotFoundError("No results found", data, request_url)
+                raise NotFoundError("No results found", data, request_url, request_id=request_id)
             elif status == "INVALID_REQUEST":
-                raise InvalidRequestError(error_message, data, request_url)
+                raise InvalidRequestError(error_message, data, request_url, request_id=request_id)
             else:
-                raise GoogleMapsAPIError(error_message, response=data, request_url=request_url)
+                raise GoogleMapsAPIError(error_message, response=data, request_url=request_url, request_id=request_id)
 
         return data
 
