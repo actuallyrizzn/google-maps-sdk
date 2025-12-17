@@ -9,6 +9,8 @@ import threading
 import logging
 import uuid
 import os
+import gzip
+import json
 from typing import Optional, Dict, Any, Callable, List
 from requests.adapters import HTTPAdapter
 from urllib3.util.retry import Retry
@@ -49,6 +51,8 @@ class BaseClient:
         cache_maxsize: int = 100,
         http_adapter: Optional[HTTPAdapter] = None,
         circuit_breaker: Optional[CircuitBreaker] = None,
+        enable_request_compression: bool = False,
+        compression_threshold: int = 1024,
     ):
         """
         Initialize base client
@@ -131,6 +135,10 @@ class BaseClient:
         
         # Initialize circuit breaker (issue #39)
         self._circuit_breaker = circuit_breaker
+        
+        # Request compression configuration (issue #49)
+        self._enable_request_compression = enable_request_compression
+        self._compression_threshold = compression_threshold
 
     @property
     def api_key(self) -> str:
@@ -542,9 +550,32 @@ class BaseClient:
                             self._logger.warning(f"Request hook raised exception: {e}", exc_info=True)
                 
                 try:
-                    response = self.session.post(
-                        url, json=data, headers=headers_with_id, params=params, timeout=request_timeout
-                    )
+                    # Request compression for large payloads (issue #49)
+                    post_data = data
+                    post_headers = headers_with_id.copy()
+                    use_json_param = True
+                    
+                    if self._enable_request_compression and data:
+                        data_json = json.dumps(data)
+                        data_bytes = data_json.encode('utf-8')
+                        
+                        if len(data_bytes) >= self._compression_threshold:
+                            # Compress the data
+                            compressed_data = gzip.compress(data_bytes)
+                            post_data = compressed_data
+                            post_headers['Content-Encoding'] = 'gzip'
+                            post_headers['Content-Type'] = 'application/json'
+                            use_json_param = False
+                            self._logger.debug(f"Compressed request body: {len(data_bytes)} -> {len(compressed_data)} bytes [ID: {request_id}]")
+                    
+                    if use_json_param:
+                        response = self.session.post(
+                            url, json=post_data, headers=post_headers, params=params, timeout=request_timeout
+                        )
+                    else:
+                        response = self.session.post(
+                            url, data=post_data, headers=post_headers, params=params, timeout=request_timeout
+                        )
                     
                     # Call response hooks (issue #35)
                     for hook in self._response_hooks:

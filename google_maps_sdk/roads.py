@@ -31,6 +31,9 @@ class RoadsClient(BaseClient):
         cache_ttl: float = 300.0,
         cache_maxsize: int = 100,
         http_adapter: Optional['HTTPAdapter'] = None,
+        circuit_breaker: Optional['CircuitBreaker'] = None,
+        enable_request_compression: bool = False,
+        compression_threshold: int = 1024,
     ):
         """
         Initialize Roads API client
@@ -45,6 +48,9 @@ class RoadsClient(BaseClient):
             cache_ttl: Cache time-to-live in seconds (default: 300.0 = 5 minutes) (issue #37)
             cache_maxsize: Maximum number of cached responses (default: 100) (issue #37)
             http_adapter: Custom HTTPAdapter for proxies, custom SSL, etc. (None to use default) (issue #38)
+            circuit_breaker: CircuitBreaker instance for failure protection (None to disable) (issue #39)
+            enable_request_compression: Enable gzip compression for large POST requests (default: False) (issue #49)
+            compression_threshold: Minimum payload size in bytes to compress (default: 1024) (issue #49)
         """
         super().__init__(
             api_key, 
@@ -57,6 +63,9 @@ class RoadsClient(BaseClient):
             cache_ttl=cache_ttl,
             cache_maxsize=cache_maxsize,
             http_adapter=http_adapter,
+            circuit_breaker=circuit_breaker,
+            enable_request_compression=enable_request_compression,
+            compression_threshold=compression_threshold,
         )
 
     def snap_to_roads(
