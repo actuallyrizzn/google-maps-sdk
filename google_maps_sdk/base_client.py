@@ -11,7 +11,7 @@ import uuid
 import os
 import gzip
 import json
-from typing import Optional, Dict, Any, Callable, List, Tuple
+from typing import Optional, Dict, Any, Callable, List
 from requests.adapters import HTTPAdapter
 from urllib3.util.retry import Retry
 from .response_types import XMLResponse, NonJSONResponse
@@ -55,8 +55,6 @@ class BaseClient:
         enable_request_compression: bool = False,
         compression_threshold: int = 1024,
         json_encoder: Optional[type] = None,
-        exception_handler: Optional[Callable[[Exception, Dict[str, Any]], Optional[Exception]]] = None,
-        response_validator: Optional[Callable[[Dict[str, Any], Dict[str, Any]], Optional[Dict[str, Any]]]] = None,
         config: Optional[ClientConfig] = None,
     ):
         """
@@ -77,8 +75,6 @@ class BaseClient:
             enable_request_compression: Enable gzip compression for large POST requests (default: False) (issue #49)
             compression_threshold: Minimum payload size in bytes to compress (default: 1024) (issue #49)
             json_encoder: Custom JSON encoder class for encoding request data (None to use default) (issue #51)
-            exception_handler: Optional callable to customize exception handling (issue #98). 
-                Receives (exception, request_info) and can return modified exception or None to use original.
             config: ClientConfig object to centralize configuration (issue #75). If provided, other parameters are ignored.
 
         Raises:
@@ -101,8 +97,6 @@ class BaseClient:
             enable_request_compression = config.enable_request_compression
             compression_threshold = config.compression_threshold
             json_encoder = config.json_encoder
-            exception_handler = config.exception_handler
-            response_validator = config.response_validator
         
         # Get API key from parameter or environment variable (issue #31)
         if api_key is None:
@@ -177,12 +171,6 @@ class BaseClient:
         
         # Custom JSON encoder (issue #51)
         self._json_encoder = json_encoder
-        
-        # Custom exception handler (issue #98)
-        self._exception_handler = exception_handler
-        
-        # Custom response validator (issue #99)
-        self._response_validator = response_validator
 
     @property
     def api_key(self) -> str:
@@ -485,8 +473,7 @@ class BaseClient:
                     # Sanitize error message to prevent API key exposure (issue #7)
                     error = GoogleMapsAPIError(f"Request failed after {max_retries + 1} attempts: {error_msg}", request_url=url)
                     error.request_id = last_request_id
-                    error.__cause__ = last_exception
-                    raise error
+                    raise error from last_exception
                 else:
                     if isinstance(last_exception, GoogleMapsAPIError) and not hasattr(last_exception, 'request_id'):
                         last_exception.request_id = last_request_id
@@ -500,16 +487,7 @@ class BaseClient:
         
         # Execute request with circuit breaker protection (issue #39)
         if self._circuit_breaker is not None:
-            try:
-                return self._circuit_breaker.call(_make_request)
-            except CircuitBreakerOpenError as e:
-                # Apply exception handler to circuit breaker errors (issue #98)
-                request_info = {
-                    'url': url,
-                    'method': 'GET',
-                }
-                error = self._apply_exception_handler(e, request_info)
-                raise error
+            return self._circuit_breaker.call(_make_request)
         else:
             return _make_request()
 
@@ -707,68 +685,28 @@ class BaseClient:
                         time.sleep(delay)
                         continue
                     else:
-                        # Non-retryable exception - apply handler and raise
-                        request_info = {
-                            'url': url,
-                            'method': 'POST',
-                            'request_id': request_id,
-                        }
-                        last_exception = self._apply_exception_handler(last_exception, request_info)
-                        raise last_exception
+                        # Non-retryable exception - raise immediately
+                        raise
                 except requests.exceptions.RequestException as e:
                     # Other request exceptions - don't retry
                     error_msg = sanitize_api_key_for_logging(str(e), self._api_key)
-                    error = GoogleMapsAPIError(f"Request failed: {error_msg}")
-                    error.__cause__ = e
-                    request_info = {
-                        'url': url,
-                        'method': 'POST',
-                        'request_id': request_id,
-                    }
-                    error = self._apply_exception_handler(error, request_info)
-                    raise error
+                    raise GoogleMapsAPIError(f"Request failed: {error_msg}") from e
             
             # If we get here, all retries failed
             if last_exception:
-                request_info = {
-                    'url': url,
-                    'method': 'POST',
-                    'request_id': request_id,
-                    'attempts': max_retries + 1,
-                }
                 if isinstance(last_exception, (requests.exceptions.Timeout, requests.exceptions.ConnectionError)):
                     # Sanitize error message to prevent API key exposure (issue #7)
                     error_msg = sanitize_api_key_for_logging(str(last_exception), self._api_key)
-                    error = GoogleMapsAPIError(f"Request failed after {max_retries + 1} attempts: {error_msg}")
-                    error.__cause__ = last_exception
-                    error = self._apply_exception_handler(error, request_info)
-                    raise error
+                    raise GoogleMapsAPIError(f"Request failed after {max_retries + 1} attempts: {error_msg}") from last_exception
                 else:
-                    last_exception = self._apply_exception_handler(last_exception, request_info)
                     raise last_exception
             
             # Should never reach here
-            error = GoogleMapsAPIError("Request failed: Unknown error")
-            request_info = {
-                'url': url,
-                'method': 'POST',
-                'request_id': request_id,
-            }
-            error = self._apply_exception_handler(error, request_info)
-            raise error
+            raise GoogleMapsAPIError("Request failed: Unknown error")
         
         # Execute request with circuit breaker protection (issue #39)
         if self._circuit_breaker is not None:
-            try:
-                return self._circuit_breaker.call(_make_request)
-            except CircuitBreakerOpenError as e:
-                # Apply exception handler to circuit breaker errors (issue #98)
-                request_info = {
-                    'url': url,
-                    'method': 'POST',
-                }
-                error = self._apply_exception_handler(e, request_info)
-                raise error
+            return self._circuit_breaker.call(_make_request)
         else:
             return _make_request()
 
@@ -788,10 +726,7 @@ class BaseClient:
             ValueError: If response cannot be parsed
         """
         # Determine content type (issue #29)
-        content_type = response.headers.get('Content-Type', '') if hasattr(response.headers, 'get') else ''
-        if not isinstance(content_type, str):
-            content_type = str(content_type) if content_type else ''
-        content_type = content_type.lower()
+        content_type = response.headers.get('Content-Type', '').lower()
         is_xml = 'xml' in content_type
         
         # Try to parse JSON
@@ -811,39 +746,6 @@ class BaseClient:
                 status_code=response.status_code
             )
             return non_json_response.to_dict()
-    
-    def _apply_exception_handler(self, exception: Exception, request_info: Optional[Dict[str, Any]] = None) -> Exception:
-        """
-        Apply custom exception handler if configured (issue #98)
-        
-        Args:
-            exception: The exception to potentially transform
-            request_info: Optional dictionary with request context (url, method, request_id, etc.)
-            
-        Returns:
-            The exception to raise (may be modified by handler or original)
-        """
-        if self._exception_handler is None:
-            return exception
-        
-        try:
-            request_info = request_info or {}
-            result = self._exception_handler(exception, request_info)
-            # If handler returns None, use original exception
-            if result is None:
-                return exception
-            # If handler returns an exception, use it
-            if isinstance(result, Exception):
-                return result
-            # If handler returns something else, use original
-            return exception
-        except Exception as handler_error:
-            # If handler itself raises an error, log and use original exception
-            self._logger.warning(
-                f"Exception handler raised error: {handler_error}. Using original exception.",
-                exc_info=True
-            )
-            return exception
     
     def _check_http_errors(self, response: requests.Response, data: Dict[str, Any], request_id: Optional[str] = None) -> None:
         """
@@ -869,12 +771,6 @@ class BaseClient:
                     request_url=str(response.url) if hasattr(response, 'url') else None,
                     request_id=request_id,
                 )
-                request_info = {
-                    'url': str(response.url) if hasattr(response, 'url') else None,
-                    'status_code': response.status_code,
-                    'request_id': request_id,
-                }
-                error = self._apply_exception_handler(error, request_info)
                 raise error
             
             # Handle non-JSON error responses
@@ -885,25 +781,11 @@ class BaseClient:
                     request_url=str(response.url) if hasattr(response, 'url') else None,
                     request_id=request_id,
                 )
-                request_info = {
-                    'url': str(response.url) if hasattr(response, 'url') else None,
-                    'status_code': response.status_code,
-                    'request_id': request_id,
-                }
-                error = self._apply_exception_handler(error, request_info)
                 raise error
             
             # Handle JSON error responses
             self._logger.warning(f"HTTP error {response.status_code} for {response.url} [ID: {request_id or 'N/A'}]: {sanitize_api_key_for_logging(str(data), self._api_key)}")
-            error = handle_http_error(response.status_code, data, response.url, request_id=request_id)
-            request_info = {
-                'url': str(response.url) if hasattr(response, 'url') else None,
-                'status_code': response.status_code,
-                'request_id': request_id,
-                'response_data': data,
-            }
-            error = self._apply_exception_handler(error, request_info)
-            raise error
+            raise handle_http_error(response.status_code, data, response.url, request_id=request_id)
     
     def _check_directions_api_errors(self, data: Dict[str, Any], response: requests.Response, request_id: Optional[str] = None) -> None:
         """
@@ -925,78 +807,19 @@ class BaseClient:
             error_message = data.get("error_message", f"API returned status: {status}")
             
             request_url = str(response.url) if hasattr(response, 'url') else None
-            request_info = {
-                'url': request_url,
-                'status': status,
-                'request_id': request_id,
-                'response_data': data,
-            }
-            
             if status == "REQUEST_DENIED":
-                error = PermissionDeniedError(error_message, data, request_url, request_id=request_id)
-                error = self._apply_exception_handler(error, request_info)
-                raise error
+                raise PermissionDeniedError(error_message, data, request_url, request_id=request_id)
             elif status == "OVER_QUERY_LIMIT":
-                error = QuotaExceededError(error_message, data, request_url, request_id=request_id)
-                error = self._apply_exception_handler(error, request_info)
-                raise error
+                raise QuotaExceededError(error_message, data, request_url, request_id=request_id)
             elif status == "NOT_FOUND":
-                error = NotFoundError(error_message, data, request_url, request_id=request_id)
-                error = self._apply_exception_handler(error, request_info)
-                raise error
+                raise NotFoundError(error_message, data, request_url, request_id=request_id)
             elif status == "ZERO_RESULTS":
-                error = NotFoundError("No results found", data, request_url, request_id=request_id)
-                error = self._apply_exception_handler(error, request_info)
-                raise error
+                raise NotFoundError("No results found", data, request_url, request_id=request_id)
             elif status == "INVALID_REQUEST":
-                error = InvalidRequestError(error_message, data, request_url, request_id=request_id)
-                error = self._apply_exception_handler(error, request_info)
-                raise error
+                raise InvalidRequestError(error_message, data, request_url, request_id=request_id)
             else:
-                error = GoogleMapsAPIError(error_message, response=data, request_url=request_url, request_id=request_id)
-                error = self._apply_exception_handler(error, request_info)
-                raise error
+                raise GoogleMapsAPIError(error_message, response=data, request_url=request_url, request_id=request_id)
 
-    def _validate_response(self, data: Dict[str, Any], request_info: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
-        """
-        Validate response data using custom validator if configured (issue #99)
-        
-        Args:
-            data: The response data to validate
-            request_info: Optional dictionary with request context (url, method, request_id, etc.)
-            
-        Returns:
-            The validated data (may be modified by validator or original)
-            
-        Raises:
-            ValueError: If validator raises ValueError
-            GoogleMapsAPIError: If validator raises GoogleMapsAPIError
-        """
-        if self._response_validator is None:
-            return data
-        
-        try:
-            request_info = request_info or {}
-            result = self._response_validator(data, request_info)
-            # If validator returns None, use original data
-            if result is None:
-                return data
-            # If validator returns data, use it
-            if isinstance(result, dict):
-                return result
-            # If validator returns something else, use original
-            return data
-        except (ValueError, GoogleMapsAPIError):
-            # Re-raise validation errors
-            raise
-        except Exception as validator_error:
-            # If validator raises unexpected error, log and raise as GoogleMapsAPIError
-            self._logger.warning(
-                f"Response validator raised unexpected error: {validator_error}. Raising as GoogleMapsAPIError.",
-                exc_info=True
-            )
-            raise GoogleMapsAPIError(f"Response validation failed: {validator_error}") from validator_error
-    
     def _handle_response(self, response: requests.Response, request_id: Optional[str] = None) -> Dict[str, Any]:
         """
         Handle HTTP response and convert to appropriate format (issue #28, #78)
@@ -1019,14 +842,6 @@ class BaseClient:
         
         # Check for Directions API errors (issue #78)
         self._check_directions_api_errors(data, response, request_id=request_id)
-        
-        # Validate response data (issue #99)
-        request_info = {
-            'url': str(response.url) if hasattr(response, 'url') else None,
-            'status_code': response.status_code,
-            'request_id': request_id,
-        }
-        data = self._validate_response(data, request_info)
 
         return data
 
