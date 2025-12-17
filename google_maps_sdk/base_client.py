@@ -5,6 +5,7 @@ Base client class for Google Maps Platform APIs
 import requests
 import warnings
 import time
+import threading
 from typing import Optional, Dict, Any
 from .exceptions import (
     handle_http_error,
@@ -73,16 +74,18 @@ class BaseClient:
         # Store client ID for rate limiting
         self._client_id = id(self)
         
-        # Create session with SSL verification enforced (issue #4)
-        self.session = requests.Session()
-        self.session.verify = True  # Explicitly enforce SSL verification
+        # Thread-local storage for sessions (issue #19)
+        # Each thread gets its own session to ensure thread safety
+        self._local = threading.local()
         
-        # Set User-Agent header (issue #13)
-        # Set Accept-Encoding header for response compression (issue #45)
-        self.session.headers.update({
-            'User-Agent': f'google-maps-sdk/{__import__("google_maps_sdk").__version__}',
-            'Accept-Encoding': 'gzip, deflate, br'
-        })
+        # Store configuration for session creation
+        self._session_config = {
+            'verify': True,  # SSL verification enforced (issue #4)
+            'headers': {
+                'User-Agent': f'google-maps-sdk/{__import__("google_maps_sdk").__version__}',
+                'Accept-Encoding': 'gzip, deflate, br'
+            }
+        }
 
     @property
     def api_key(self) -> str:
@@ -102,6 +105,24 @@ class BaseClient:
             stacklevel=2
         )
         return self._api_key
+
+    @property
+    def session(self) -> requests.Session:
+        """
+        Get thread-local session (issue #19)
+        
+        Each thread gets its own session instance to ensure thread safety.
+        Sessions are created lazily on first access.
+        
+        Returns:
+            Thread-local requests.Session instance
+        """
+        if not hasattr(self._local, 'session'):
+            # Create session for this thread
+            self._local.session = requests.Session()
+            self._local.session.verify = self._session_config['verify']
+            self._local.session.headers.update(self._session_config['headers'])
+        return self._local.session
 
     def set_api_key(self, api_key: str) -> None:
         """
@@ -387,20 +408,23 @@ class BaseClient:
 
     def close(self):
         """
-        Close the HTTP session (idempotent) (issue #17)
+        Close all thread-local HTTP sessions (idempotent) (issue #17, #19)
         
-        Can be called multiple times safely. If session is already closed,
+        Closes sessions for all threads that have accessed this client.
+        Can be called multiple times safely. If sessions are already closed,
         this method does nothing.
         """
-        if hasattr(self, 'session') and self.session is not None:
+        # Close thread-local session for current thread
+        if hasattr(self, '_local') and hasattr(self._local, 'session'):
             try:
-                self.session.close()
+                if self._local.session is not None:
+                    self._local.session.close()
             except Exception:
                 # Ignore errors during cleanup - session may already be closed
                 pass
             finally:
-                # Mark session as closed to make subsequent calls idempotent
-                self.session = None
+                # Mark session as closed
+                self._local.session = None
 
     def __enter__(self):
         return self
