@@ -1,2 +1,4 @@
-requests>=2.31.0
+# Production dependencies
+# Pinned versions for reproducible builds (issue #81)
+requests==2.32.5
 

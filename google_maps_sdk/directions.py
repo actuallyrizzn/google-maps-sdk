@@ -4,8 +4,14 @@ Directions API (Legacy) Client
 Legacy directions service. Consider migrating to Routes API for new projects.
 """
 
-from typing import Optional, Dict, Any, List, Union
+from typing import Optional, Dict, Any, List, Union, TYPE_CHECKING
 from .base_client import BaseClient
+from .retry import RetryConfig
+from .types import DirectionsResponse
+
+if TYPE_CHECKING:
+    from requests.adapters import HTTPAdapter
+    from .circuit_breaker import CircuitBreaker
 from .utils import (
     validate_waypoint_count,
     validate_language_code,
@@ -22,15 +28,56 @@ class DirectionsClient(BaseClient):
 
     BASE_URL = "https://maps.googleapis.com/maps/api/directions"
 
-    def __init__(self, api_key: str, timeout: int = 30):
+    def __init__(
+        self, 
+        api_key: Optional[str] = None, 
+        timeout: int = 30,
+        rate_limit_max_calls: Optional[int] = None,
+        rate_limit_period: Optional[float] = None,
+        retry_config: Optional[RetryConfig] = None,
+        enable_cache: bool = False,
+        cache_ttl: float = 300.0,
+        cache_maxsize: int = 100,
+        http_adapter: Optional['HTTPAdapter'] = None,
+        circuit_breaker: Optional['CircuitBreaker'] = None,
+        enable_request_compression: bool = False,
+        compression_threshold: int = 1024,
+        json_encoder: Optional[type] = None,
+    ):
         """
         Initialize Directions API client
 
         Args:
-            api_key: Google Maps Platform API key
+            api_key: Google Maps Platform API key (optional, can use GOOGLE_MAPS_API_KEY env var) (issue #31)
             timeout: Request timeout in seconds
+            rate_limit_max_calls: Maximum calls per period for rate limiting (None to disable)
+            rate_limit_period: Time period in seconds for rate limiting (default: 60.0)
+            retry_config: Retry configuration (None to disable retries) (issue #11)
+            enable_cache: Enable response caching (default: False) (issue #37)
+            cache_ttl: Cache time-to-live in seconds (default: 300.0 = 5 minutes) (issue #37)
+            cache_maxsize: Maximum number of cached responses (default: 100) (issue #37)
+            http_adapter: Custom HTTPAdapter for proxies, custom SSL, etc. (None to use default) (issue #38)
+            circuit_breaker: CircuitBreaker instance for failure protection (None to disable) (issue #39)
+            enable_request_compression: Enable gzip compression for large POST requests (default: False) (issue #49)
+            compression_threshold: Minimum payload size in bytes to compress (default: 1024) (issue #49)
+            json_encoder: Custom JSON encoder class for encoding request data (None to use default) (issue #51)
         """
-        super().__init__(api_key, self.BASE_URL, timeout)
+        super().__init__(
+            api_key, 
+            self.BASE_URL, 
+            timeout,
+            rate_limit_max_calls=rate_limit_max_calls,
+            rate_limit_period=rate_limit_period,
+            retry_config=retry_config,
+            enable_cache=enable_cache,
+            cache_ttl=cache_ttl,
+            cache_maxsize=cache_maxsize,
+            http_adapter=http_adapter,
+            circuit_breaker=circuit_breaker,
+            enable_request_compression=enable_request_compression,
+            compression_threshold=compression_threshold,
+            json_encoder=json_encoder,
+        )
 
     def get_directions(
         self,
@@ -49,7 +96,7 @@ class DirectionsClient(BaseClient):
         transit_mode: Optional[List[str]] = None,
         transit_routing_preference: Optional[str] = None,
         output_format: str = "json",
-    ) -> Dict[str, Any]:
+    ) -> DirectionsResponse:
         """
         Get directions between two locations
 

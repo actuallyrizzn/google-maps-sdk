@@ -168,4 +168,69 @@ class TestRoutesClientComputeRouteMatrix:
         client.close()
 
 
+@pytest.mark.unit
+class TestRoutesClientAuthentication:
+    """Test RoutesClient authentication method (issue #1)"""
+
+    @patch("google_maps_sdk.routes.requests.Session.post")
+    def test_post_uses_header_auth_not_query_param(self, mock_post, api_key, sample_origin, sample_destination):
+        """Test that RoutesClient uses X-Goog-Api-Key header instead of query parameter"""
+        # Mock successful response
+        mock_response = MagicMock()
+        mock_response.status_code = 200
+        mock_response.json.return_value = {"routes": []}
+        mock_response.url = "https://routes.googleapis.com/directions/v2:computeRoutes"
+        mock_post.return_value = mock_response
+        
+        client = RoutesClient(api_key)
+        client.compute_routes(sample_origin, sample_destination)
+        
+        # Verify POST was called
+        assert mock_post.called
+        
+        # Get call arguments
+        call_kwargs = mock_post.call_args[1]
+        
+        # Verify API key is in headers, not params
+        assert "X-Goog-Api-Key" in call_kwargs["headers"]
+        assert call_kwargs["headers"]["X-Goog-Api-Key"] == api_key
+        
+        # Verify API key is NOT in query params
+        params = call_kwargs.get("params", {})
+        assert "key" not in params
+        
+        client.close()
+
+    @patch("google_maps_sdk.routes.requests.Session.post")
+    def test_post_route_matrix_uses_header_auth(self, mock_post, api_key, sample_origin, sample_destination):
+        """Test that compute_route_matrix also uses header-based auth"""
+        # Mock successful response
+        mock_response = MagicMock()
+        mock_response.status_code = 200
+        mock_response.json.return_value = {"routeMatrixElements": []}
+        mock_response.url = "https://routes.googleapis.com/distanceMatrix/v2:computeRouteMatrix"
+        mock_post.return_value = mock_response
+        
+        client = RoutesClient(api_key)
+        origins = [sample_origin]
+        destinations = [sample_destination]
+        client.compute_route_matrix(origins, destinations)
+        
+        # Verify POST was called
+        assert mock_post.called
+        
+        # Get call arguments
+        call_kwargs = mock_post.call_args[1]
+        
+        # Verify API key is in headers
+        assert "X-Goog-Api-Key" in call_kwargs["headers"]
+        assert call_kwargs["headers"]["X-Goog-Api-Key"] == api_key
+        
+        # Verify API key is NOT in query params
+        params = call_kwargs.get("params", {})
+        assert "key" not in params
+        
+        client.close()
+
+
 

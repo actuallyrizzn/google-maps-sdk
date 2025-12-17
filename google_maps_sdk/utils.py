@@ -440,6 +440,77 @@ def validate_language_code(language_code: Optional[str]) -> Optional[str]:
     return language_code
 
 
+def validate_api_version(api_version: Optional[str]) -> Optional[str]:
+    """
+    Validate API version format (issue #76)
+    
+    Args:
+        api_version: API version string (e.g., "v1", "v2")
+        
+    Returns:
+        Validated API version string
+        
+    Raises:
+        ValueError: If API version format is invalid
+    """
+    if api_version is None:
+        return None
+    
+    if not isinstance(api_version, str):
+        raise TypeError("API version must be a string")
+    
+    api_version = api_version.strip()
+    
+    if not api_version:
+        raise ValueError("API version cannot be empty or whitespace-only")
+    
+    # Validate format: should start with 'v' followed by digits
+    import re
+    version_pattern = re.compile(r'^v\d+$', re.IGNORECASE)
+    
+    if not version_pattern.match(api_version):
+        raise ValueError(f"Invalid API version format: {api_version}. Expected format: 'v1', 'v2', 'v3', etc.")
+    
+    return api_version.lower()  # Normalize to lowercase
+
+
+def validate_region(region: Optional[str]) -> Optional[str]:
+    """
+    Validate Google Cloud region format (issue #77)
+    
+    Args:
+        region: Region string (e.g., "us-central1", "europe-west1", "asia-east1")
+        
+    Returns:
+        Validated region string (lowercase)
+        
+    Raises:
+        ValueError: If region format is invalid
+    """
+    if region is None:
+        return None
+    
+    if not isinstance(region, str):
+        raise TypeError("Region must be a string")
+    
+    region = region.strip().lower()
+    
+    if not region:
+        raise ValueError("Region cannot be empty or whitespace-only")
+    
+    # Validate format: should match Google Cloud region pattern
+    # Format: {location}-{number} (e.g., us-central1, europe-west1)
+    region_pattern = re.compile(r'^[a-z]+-[a-z0-9]+[0-9]+$')
+    
+    if not region_pattern.match(region):
+        raise ValueError(
+            f"Invalid region format: {region}. "
+            f"Expected format: 'us-central1', 'europe-west1', 'asia-east1', etc."
+        )
+    
+    return region
+
+
 def validate_units(units: Optional[str]) -> Optional[str]:
     """
     Validate units parameter (issue #44)

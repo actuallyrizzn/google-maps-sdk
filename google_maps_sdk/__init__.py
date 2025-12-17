@@ -30,6 +30,12 @@ from .types import (
     TravelMode,
     DepartureTime,
     FieldMask,
+    RouteResponse,
+    RouteMatrixResponse,
+    DirectionsResponse,
+    SnapToRoadsResponse,
+    NearestRoadsResponse,
+    SpeedLimitsResponse,
 )
 
 __version__ = "1.0.0"
@@ -60,5 +66,12 @@ __all__ = [
     "TravelMode",
     "DepartureTime",
     "FieldMask",
+    # Response types (issue #18)
+    "RouteResponse",
+    "RouteMatrixResponse",
+    "DirectionsResponse",
+    "SnapToRoadsResponse",
+    "NearestRoadsResponse",
+    "SpeedLimitsResponse",
 ]
 
