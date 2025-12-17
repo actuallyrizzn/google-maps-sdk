@@ -4,11 +4,14 @@ Main Google Maps Platform client
 Unified client providing access to all Google Maps Platform APIs.
 """
 
-from typing import Optional
+from typing import Optional, TYPE_CHECKING
 from .routes import RoutesClient
 from .directions import DirectionsClient
 from .roads import RoadsClient
 from .retry import RetryConfig
+
+if TYPE_CHECKING:
+    from requests.adapters import HTTPAdapter
 
 
 class GoogleMapsClient:
@@ -29,6 +32,7 @@ class GoogleMapsClient:
         enable_cache: bool = False,
         cache_ttl: float = 300.0,
         cache_maxsize: int = 100,
+        http_adapter: Optional['HTTPAdapter'] = None,
     ):
         """
         Initialize Google Maps Platform client
@@ -42,6 +46,7 @@ class GoogleMapsClient:
             enable_cache: Enable response caching (default: False) (issue #37)
             cache_ttl: Cache time-to-live in seconds (default: 300.0 = 5 minutes) (issue #37)
             cache_maxsize: Maximum number of cached responses (default: 100) (issue #37)
+            http_adapter: Custom HTTPAdapter for proxies, custom SSL, etc. (None to use default) (issue #38)
 
         Example:
             >>> client = GoogleMapsClient(api_key="YOUR_API_KEY")
@@ -62,7 +67,7 @@ class GoogleMapsClient:
         self.api_key = api_key
         self.timeout = timeout
 
-        # Initialize sub-clients with rate limiting, retry, and cache
+        # Initialize sub-clients with rate limiting, retry, cache, and custom adapter
         self.routes = RoutesClient(
             api_key, 
             timeout,
@@ -72,6 +77,7 @@ class GoogleMapsClient:
             enable_cache=enable_cache,
             cache_ttl=cache_ttl,
             cache_maxsize=cache_maxsize,
+            http_adapter=http_adapter,
         )
         self.directions = DirectionsClient(
             api_key, 
@@ -82,6 +88,7 @@ class GoogleMapsClient:
             enable_cache=enable_cache,
             cache_ttl=cache_ttl,
             cache_maxsize=cache_maxsize,
+            http_adapter=http_adapter,
         )
         self.roads = RoadsClient(
             api_key, 
@@ -92,6 +99,7 @@ class GoogleMapsClient:
             enable_cache=enable_cache,
             cache_ttl=cache_ttl,
             cache_maxsize=cache_maxsize,
+            http_adapter=http_adapter,
         )
 
     def set_api_key(self, api_key: str) -> None:

@@ -39,6 +39,7 @@ class RoutesClient(BaseClient):
         enable_cache: bool = False,
         cache_ttl: float = 300.0,
         cache_maxsize: int = 100,
+        http_adapter: Optional['HTTPAdapter'] = None,
     ):
         """
         Initialize Routes API client
@@ -52,6 +53,7 @@ class RoutesClient(BaseClient):
             enable_cache: Enable response caching (default: False) (issue #37)
             cache_ttl: Cache time-to-live in seconds (default: 300.0 = 5 minutes) (issue #37)
             cache_maxsize: Maximum number of cached responses (default: 100) (issue #37)
+            http_adapter: Custom HTTPAdapter for proxies, custom SSL, etc. (None to use default) (issue #38)
         """
         super().__init__(
             api_key, 
@@ -63,6 +65,7 @@ class RoutesClient(BaseClient):
             enable_cache=enable_cache,
             cache_ttl=cache_ttl,
             cache_maxsize=cache_maxsize,
+            http_adapter=http_adapter,
         )
 
     def _post(

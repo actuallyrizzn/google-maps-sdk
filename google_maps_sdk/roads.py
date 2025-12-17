@@ -4,11 +4,14 @@ Roads API Client
 Service for snapping GPS coordinates to roads and getting road metadata.
 """
 
-from typing import Optional, List, Dict, Any, Tuple, Union
+from typing import Optional, List, Dict, Any, Tuple, Union, TYPE_CHECKING
 from .base_client import BaseClient
 from .retry import RetryConfig
 from .types import SnapToRoadsResponse, NearestRoadsResponse, SpeedLimitsResponse
 from .utils import validate_path_or_points, MAX_ROADS_POINTS
+
+if TYPE_CHECKING:
+    from requests.adapters import HTTPAdapter
 
 
 class RoadsClient(BaseClient):
@@ -26,6 +29,7 @@ class RoadsClient(BaseClient):
         enable_cache: bool = False,
         cache_ttl: float = 300.0,
         cache_maxsize: int = 100,
+        http_adapter: Optional['HTTPAdapter'] = None,
     ):
         """
         Initialize Roads API client
@@ -39,6 +43,7 @@ class RoadsClient(BaseClient):
             enable_cache: Enable response caching (default: False) (issue #37)
             cache_ttl: Cache time-to-live in seconds (default: 300.0 = 5 minutes) (issue #37)
             cache_maxsize: Maximum number of cached responses (default: 100) (issue #37)
+            http_adapter: Custom HTTPAdapter for proxies, custom SSL, etc. (None to use default) (issue #38)
         """
         super().__init__(
             api_key, 
@@ -50,6 +55,7 @@ class RoadsClient(BaseClient):
             enable_cache=enable_cache,
             cache_ttl=cache_ttl,
             cache_maxsize=cache_maxsize,
+            http_adapter=http_adapter,
         )
 
     def snap_to_roads(

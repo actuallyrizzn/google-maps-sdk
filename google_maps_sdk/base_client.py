@@ -46,6 +46,7 @@ class BaseClient:
         enable_cache: bool = False,
         cache_ttl: float = 300.0,
         cache_maxsize: int = 100,
+        http_adapter: Optional[HTTPAdapter] = None,
     ):
         """
         Initialize base client
@@ -109,6 +110,9 @@ class BaseClient:
             'max_retries': 0,  # We handle retries ourselves (issue #11)
         }
         
+        # Store custom HTTP adapter (issue #38)
+        self._http_adapter = http_adapter
+        
         # Initialize logger (issue #26)
         self._logger = logging.getLogger(f"{__name__}.{self.__class__.__name__}")
         
@@ -159,14 +163,20 @@ class BaseClient:
             self._local.session.verify = self._session_config['verify']
             self._local.session.headers.update(self._session_config['headers'])
             
-            # Configure connection pooling (issue #27)
-            adapter = HTTPAdapter(
-                pool_connections=self._session_config['pool_connections'],
-                pool_maxsize=self._session_config['pool_maxsize'],
-                max_retries=Retry(total=self._session_config['max_retries'])  # We handle retries ourselves
-            )
-            self._local.session.mount('https://', adapter)
-            self._local.session.mount('http://', adapter)
+            # Configure connection pooling (issue #27, #38)
+            if self._http_adapter is not None:
+                # Use custom HTTP adapter if provided
+                self._local.session.mount('https://', self._http_adapter)
+                self._local.session.mount('http://', self._http_adapter)
+            else:
+                # Use default adapter with configured pooling
+                adapter = HTTPAdapter(
+                    pool_connections=self._session_config['pool_connections'],
+                    pool_maxsize=self._session_config['pool_maxsize'],
+                    max_retries=Retry(total=self._session_config['max_retries'])  # We handle retries ourselves
+                )
+                self._local.session.mount('https://', adapter)
+                self._local.session.mount('http://', adapter)
         return self._local.session
 
     def set_api_key(self, api_key: str) -> None:
