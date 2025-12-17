@@ -33,6 +33,7 @@ from .rate_limiter import RateLimiter
 from .retry import RetryConfig, should_retry, exponential_backoff
 from .cache import TTLCache, generate_cache_key
 from .circuit_breaker import CircuitBreaker, CircuitBreakerOpenError
+from .config import ClientConfig
 
 
 class BaseClient:
@@ -54,6 +55,7 @@ class BaseClient:
         enable_request_compression: bool = False,
         compression_threshold: int = 1024,
         json_encoder: Optional[type] = None,
+        config: Optional[ClientConfig] = None,
     ):
         """
         Initialize base client
@@ -73,11 +75,29 @@ class BaseClient:
             enable_request_compression: Enable gzip compression for large POST requests (default: False) (issue #49)
             compression_threshold: Minimum payload size in bytes to compress (default: 1024) (issue #49)
             json_encoder: Custom JSON encoder class for encoding request data (None to use default) (issue #51)
+            config: ClientConfig object to centralize configuration (issue #75). If provided, other parameters are ignored.
 
         Raises:
             TypeError: If api_key is not a string
             ValueError: If api_key or base_url is invalid
         """
+        # If config object is provided, use it and ignore other parameters (issue #75)
+        if config is not None:
+            api_key = config.api_key
+            base_url = config.base_url
+            timeout = config.timeout
+            rate_limit_max_calls = config.rate_limit_max_calls
+            rate_limit_period = config.rate_limit_period
+            retry_config = config.retry_config
+            enable_cache = config.enable_cache
+            cache_ttl = config.cache_ttl
+            cache_maxsize = config.cache_maxsize
+            http_adapter = config.http_adapter
+            circuit_breaker = config.circuit_breaker
+            enable_request_compression = config.enable_request_compression
+            compression_threshold = config.compression_threshold
+            json_encoder = config.json_encoder
+        
         # Get API key from parameter or environment variable (issue #31)
         if api_key is None:
             api_key = os.getenv("GOOGLE_MAPS_API_KEY")
