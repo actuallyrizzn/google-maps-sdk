@@ -307,7 +307,13 @@ See the [docs](./docs/) directory for comprehensive API documentation:
 
 ## License
 
-MIT License
+### Code License
+
+The code in this project is licensed under the **GNU Affero General Public License v3.0 or later (AGPL-3.0-or-later)**. See [LICENSE](LICENSE) for the full license text.
+
+### Documentation License
+
+All documentation, including but not limited to markdown files, examples, and guides in the `docs/` directory, is licensed under the **Creative Commons Attribution-ShareAlike 4.0 International (CC-BY-SA 4.0)**. See [LICENSE-DOCS](LICENSE-DOCS) for the full license text.
 
 ## Contributing
 
