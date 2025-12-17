@@ -80,7 +80,9 @@ class TestRetryScenarios:
         def mock_handle(response, request_id=None):
             call_count[0] += 1
             if call_count[0] == 1:
-                raise InternalServerError("Server error", status_code=500, request_id=request_id)
+                error = InternalServerError("Server error", request_id=request_id)
+                error.status_code = 500
+                raise error
             return original_handle(response, request_id=request_id)
         
         client._handle_response = mock_handle
